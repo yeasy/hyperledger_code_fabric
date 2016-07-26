@@ -1,10 +1,10 @@
-
 # Hyperledger 源码分析之 Fabric
+
 0.2.0
 
-区块链技术是计算机技术与金融技术交融的成功创新。如果你还不了解区块链，可以阅读 [区块链技术指南](https://www.gitbook.com/book/yeasy/blockchain_guide)。
+区块链技术是计算机技术与金融技术交融的成功创新，被认为是极具潜力的分布式账本核心技术。如果你还不了解区块链，可以阅读 [区块链技术指南](https://www.gitbook.com/book/yeasy/blockchain_guide)。
 
-作为 Linux 基金会支持的开源分布式账本平台，[Hyperledger](https://hyperledger.org)受到了众多企业的支持和开源界的关注。本书将试图剖析 Hyperledger 相关项目的源码，帮助大家深入理解其实现原理。
+作为 Linux 基金会支持的开源分布式账本平台，[Hyperledger](https://hyperledger.org)受到了众多企业的支持和开源界的关注。本书将试图剖析 Hyperledger 核心的平台实现 Fabric 子项目相关源码，帮助大家深入理解其实现原理。
 
 在线阅读：[GitBook](https://www.gitbook.com/book/yeasy/hyperledger_code_fabric) 或 [GitHub](https://github.com/yeasy/hyperledger_code_fabric/blob/master/SUMMARY.md)。
 
@@ -15,16 +15,20 @@
 ## 版本历史
 
 * 0.3.0: 2016-XX-YY
-    * 基本功能分析。
+  * 基本功能分析。
+
 * 0.2.0: 2016-07-01
-    * 基本功能分析。
+  * 基本功能分析。
+
 * 0.1.0: 2016-06-08
-    * 完成基础框架。
+  * 完成基础框架。
+
 
 ## 参与贡献
+
 贡献者 [名单](https://github.com/yeasy/hyperledger_code_fabric/graphs/contributors)。
 
-本书源码开源托管在 Github 上，欢迎参与维护：[github.com/yeasy/hyperledger_code_fabric](https://github.com/yeasy/hyperledger_code_fabric)。
+本书源码开源托管在 Github 上，欢迎参与维护：[github.com\/yeasy\/hyperledger\_code\_fabric](https://github.com/yeasy/hyperledger_code_fabric)。
 
 首先，在 GitHub 上 `fork` 到自己的仓库，如 `docker_user/hyperledger_code_fabric`，然后 `clone` 到本地，并设置用户信息。
 
@@ -46,6 +50,7 @@ $ git push
 最后，在 GitHub 网站上提交 pull request 即可。
 
 另外，建议定期使用项目仓库内容更新自己仓库内容。
+
 ```sh
 $ git remote add upstream https://github.com/yeasy/hyperledger_code_fabric
 $ git fetch upstream
@@ -53,3 +58,5 @@ $ git checkout master
 $ git rebase upstream/master
 $ git push -f origin master
 ```
+
+*本书结构由 [gitbook_gen](https://github.com/yeasy/code_snippet/blob/master/python/gitbook_gen.py) 维护。*
