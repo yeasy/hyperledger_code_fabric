@@ -1,0 +1,1 @@
+## chaincodeevent.proto

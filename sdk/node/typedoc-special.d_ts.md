@@ -1,0 +1,1 @@
+### typedoc-special.d.ts

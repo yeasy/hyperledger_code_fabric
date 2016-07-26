@@ -1,0 +1,1 @@
+#### emitterc.go
