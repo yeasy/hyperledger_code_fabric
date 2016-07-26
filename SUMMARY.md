@@ -1,5 +1,6 @@
 #Summary
 
+* [概览](overview.md)
 * [bddtests](bddtests/README.md)
    * [chaincode](bddtests/chaincode/README.md)
       * [go](bddtests/chaincode/go/README.md)
@@ -742,10 +743,4 @@
          * [yamlh.go](vendor/gopkg.in/yaml.v2/yamlh_go.md)
          * [yamlprivateh.go](vendor/gopkg.in/yaml.v2/yamlprivateh_go.md)
    * [vendor.json](vendor/vendor_json.md)
-* [CONTRIBUTING.md](CONTRIBUTING_md.md)
-* [LICENSE](LICENSE.md)
-* [MAINTAINERS.txt](MAINTAINERS_txt.md)
-* [Makefile](Makefile.md)
-* [mkdocs.yml](mkdocs_yml.md)
-* [README.md](README_md.md)
-* [TravisCI_Readme.md](TravisCI_Readme_md.md)
+* [其它文件](others.md)
