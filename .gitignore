@@ -14,3 +14,7 @@ _book
 *.epub
 *.mobi
 *.pdf
+
+# sublime
+*.sublime-project
+*.sublime-workspace
