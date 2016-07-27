@@ -1,7 +1,7 @@
 # protos
 Protobuf 格式的数据结构和消息协议。都在同一个 protos 包内。
 
-这里面是所有基本的消息定义和 GRPC 的接口声明。
+这里面是所有基本的数据结构（message）定义和 GRPC 的服务（service）接口声明。
 
 所有的 `.proto` 文件是 protobuf 格式的声明文件，`.pb.go` 文件是基于 `.proto` 文件生成的 go 语言的类文件。
 
