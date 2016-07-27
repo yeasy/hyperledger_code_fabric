@@ -1,5 +1,5 @@
 # protos
-Protobuf 格式的数据结构和消息协议。
+Protobuf 格式的数据结构和消息协议。都在同一个 protos 包内。
 
 这里面是所有基本的消息定义和 GRPC 的接口声明。
 
