@@ -46,7 +46,7 @@ message ChaincodeSpec {
 }
 ```
 
-其中，ChiancodeInput 主要包括函数和参数。
+其中，ChaincodeInput 主要包括函数和参数。
 
 ```
 message ChaincodeInput {
