@@ -15,7 +15,7 @@ type coordinatorImpl struct {
 }
 ```
 
-继承自 consensus.Executor 接口，实现了相关方法。
+继承自 consensus.Executor 接口，以事件队列的方式实现了相关方法（各方法对应的事件也在该文件中定义）。
 
 * ProcessEvent()：收到事件后进行处理，包括 executeEvent、commitEvent、rollbackEvent、stateUpdateEvent。
 * Commit()：添加一个 commit 事件到队列。

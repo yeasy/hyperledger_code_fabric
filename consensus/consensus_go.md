@@ -74,9 +74,20 @@ type Communicator interface {
 }
 ```
 
+### SecurityUtils
+
+包括签名和验证，具体实现时会借助core/crypto包。
+
+```go
+type SecurityUtils interface {
+	Sign(msg []byte) ([]byte, error)
+	Verify(peerID *pb.PeerID, signature []byte, message []byte) error
+}
+```
+
 ### Executor
 
-具体执行 commit、提交或回滚。
+具体执行交易、提交或回滚。会修改账本状态。
 
 
 ```go
@@ -90,9 +101,37 @@ type Executor interface {
 }
 ```
 
+### LegacyExecutor
+
+Raw Executor接口，目前仍然在被使用，如executor中coordinator具体处理事件、以及noops中的直接调用。将来可能会被完全替换掉。
+
+```go
+type LegacyExecutor interface {
+	BeginTxBatch(id interface{}) error
+	ExecTxs(id interface{}, txs []*pb.Transaction) ([]byte, error)
+	CommitTxBatch(id interface{}, metadata []byte) (*pb.Block, error)
+	RollbackTxBatch(id interface{}) error
+	PreviewCommitTxBatch(id interface{}, metadata []byte) ([]byte, error)
+}
+```
+
+### ReadOnlyLedger
+
+查询本地账本信息，而不会修改账本。具体实现会借助core/ledger包。
+
+```go
+type ReadOnlyLedger interface {
+	GetBlock(id uint64) (block *pb.Block, err error)
+	GetBlockchainSize() uint64
+	GetBlockchainInfo() *pb.BlockchainInfo
+	GetBlockchainInfoBlob() []byte
+	GetBlockHeadMetadata() ([]byte, error)
+}
+```
+
 ### Stack
 
-包括了 NetworkStack、SecurityUtils、Executor 接口等一系列句柄方法集合，辅助 consensus 处理。
+包括了上述 NetworkStack、SecurityUtils、Executor 接口等一系列句柄方法集合，辅助 consensus 处理。
 
 ```go
 type Stack interface {
