@@ -14,4 +14,4 @@ type blockchain struct {
 ```
 
 * 查询类方法：getLastBlock、getSize、getBlock、getBlockByHash、getTransactionByUUID、getTransactions、getTransactionsByBlockHash、getTransaction、getTransactionByBlockHash、getBlockchainInfo、getBlockchainInfoForBlock。
-* 更新类方法：buildBlock 和 addPersistenceChangesForNewBlock，主要在commit交易时被调用。
+* 更新类方法：buildBlock 和 addPersistenceChangesForNewBlock，主要在 commit 交易时被调用。
