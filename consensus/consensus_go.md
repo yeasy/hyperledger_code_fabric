@@ -76,7 +76,7 @@ type Communicator interface {
 
 ### SecurityUtils
 
-包括签名和验证，具体实现时会借助core/crypto包。
+包括签名和验证，具体实现时会借助 core/crypto 包。
 
 ```go
 type SecurityUtils interface {
@@ -103,7 +103,7 @@ type Executor interface {
 
 ### LegacyExecutor
 
-Raw Executor接口，目前仍然在被使用，如executor中coordinator具体处理事件、以及noops中的直接调用。将来可能会被完全替换掉。
+Raw Executor接口，目前仍然在被使用，如 executor 中 coordinator 具体处理事件、以及 noops 中的直接调用。将来可能会被完全替换掉。
 
 ```go
 type LegacyExecutor interface {
@@ -117,7 +117,7 @@ type LegacyExecutor interface {
 
 ### ReadOnlyLedger
 
-查询本地账本信息，而不会修改账本。具体实现会借助core/ledger包。
+查询本地账本信息，而不会修改账本。具体实现会借助 core/ledger 包。
 
 ```go
 type ReadOnlyLedger interface {
