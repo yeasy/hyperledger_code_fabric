@@ -13,6 +13,6 @@ type Ledger struct {
 
 提供三类方法：
 
-* 交易相关：主要被 consenus 模块调用，BeginTxBatch、CommitTxBatch 和 RollbackTxBatch。
+* 交易相关：主要被 consensus 模块调用，BeginTxBatch、CommitTxBatch 和 RollbackTxBatch。
 * 世界观相关：主要被 chaincode 请求来调用，查看和修改世界观数据库。
 * 区块链相关：获取区块链和交易信息等。
