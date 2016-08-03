@@ -26,4 +26,4 @@ type UpdatedValue struct {
 }
 ```
 
-StateDelta 实现了对状态的增删改查、对 StateDelta 整体计算加密哈希和 Marshal 等方法。
+StateDelta 的方法包括对状态增量的增删改查、对 StateDelta 整体计算加密哈希和 Marshal / Unmarshal 等。
