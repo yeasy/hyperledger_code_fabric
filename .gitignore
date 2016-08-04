@@ -18,3 +18,6 @@ _book
 # sublime
 *.sublime-project
 *.sublime-workspace
+
+# graffle
+*.graffle
