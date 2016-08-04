@@ -54,6 +54,9 @@ message Block {
 }
 ```
 
+每个区块记录着前一个区块的哈希值。除此之外，还记录着两个重要信息：该区块收录的所有交易、依次执行完这些交易后的世界观的哈希值（即 stateHash，如存储世界观的默克尔树的根节点的哈希值）。
+NonHashData 用来记录本地节点区块加入区块链的时间戳、区块中交易的结果等等，不属于区块被哈希的部分，并不要求在所有节点上一致。
+
 ### BlockchainInfo
 区块链信息。
 
@@ -100,6 +103,8 @@ message Message {
     bytes signature = 4;
 }
 ```
+
+其中，payload 包含的对象取决于消息的类型。比如，如果消息类型是 CHAIN_TRANSACTION，那么 payload 就是一个 Transaction 对象。
 
 ### Peer 提供的服务
 
