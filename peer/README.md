@@ -6,12 +6,12 @@
 
 ## 启动服务
 
-![peer node start](images/node_start.png)
+![peer node start](_images/node_start.png)
 
 ## 查看状态
 
-![peer node status](images/node_status.png)
+![peer node status](_images/node_status.png)
 
 ## 停止服务
 
-![peer node stop](images/node_stop.png)
+![peer node stop](_images/node_stop.png)
