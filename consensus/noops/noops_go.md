@@ -22,7 +22,9 @@ type Noops struct {
 
 processBlock() 方法进一步调用 processTransactions() 方法，批量执行交易，如果成功则提交并向 NVP 们广播 SYNC_BLOCK_ADDED 消息，失败则回滚。具体实现上，调用的 stack 结构，里面的方法实现在 helper 包中。
 
-#### newNoops 方法
+![consensus noops 主要过程](../_images/consensus_noops.png)
+
+#### newNoops() 方法
 
 ```go
 func newNoops(c consensus.Stack) consensus.Consenter {
@@ -54,6 +56,32 @@ func newNoops(c consensus.Stack) consensus.Consenter {
 	i.timer.Stop()
 	go i.handleChannels()
 	return i
+}
+```
+
+#### RecvMsg()
+被调用，入口函数。
+```go
+func (i *Noops) RecvMsg(msg *pb.Message, senderHandle *pb.PeerID) error {
+	if logger.IsEnabledFor(logging.DEBUG) {
+		logger.Debugf("Handling Message of type: %s ", msg.Type)
+	}
+	if msg.Type == pb.Message_CHAIN_TRANSACTION {
+		if err := i.broadcastConsensusMsg(msg); nil != err {
+			return err
+		}
+	}
+	if msg.Type == pb.Message_CONSENSUS {
+		tx, err := i.getTxFromMsg(msg)
+		if nil != err {
+			return err
+		}
+		if logger.IsEnabledFor(logging.DEBUG) {
+			logger.Debugf("Sending to channel tx uuid: %s", tx.Uuid)
+		}
+		i.channel <- tx
+	}
+	return nil
 }
 ```
 
