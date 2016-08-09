@@ -26,31 +26,14 @@ type Consenter interface {
 }
 ```
 
-RecvMsg() 方法处理 CHAIN_TRANSACTION 消息 和 CONSENSUS 消息。
+接口方法包括：
 
-```go
-func (i *Noops) RecvMsg(msg *pb.Message, senderHandle *pb.PeerID) error {
-	if logger.IsEnabledFor(logging.DEBUG) {
-		logger.Debugf("Handling Message of type: %s ", msg.Type)
-	}
-	if msg.Type == pb.Message_CHAIN_TRANSACTION {
-		if err := i.broadcastConsensusMsg(msg); nil != err {
-			return err
-		}
-	}
-	if msg.Type == pb.Message_CONSENSUS {
-		tx, err := i.getTxFromMsg(msg)
-		if nil != err {
-			return err
-		}
-		if logger.IsEnabledFor(logging.DEBUG) {
-			logger.Debugf("Sending to channel tx uuid: %s", tx.Uuid)
-		}
-		i.channel <- tx
-	}
-	return nil
-}
-```
+* RecvMsg()：收到消息时被调用，处理各种跟交易和 consensus 相关的消息；
+* Executed()：执行完成时被调用；
+* Committed()：交易提交完成时被调用；
+* RolledBack()：交易回滚完成时被调用；
+* StateUpdated()：状态更新完成时被调用。
+
 
 ### Inquirer
 
