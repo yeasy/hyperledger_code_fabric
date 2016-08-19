@@ -1,6 +1,6 @@
 # Hyperledger 源码分析之 Fabric
 
-0.3.0
+0.3.2
 
 区块链技术是计算机技术与金融技术交融的成功创新，被认为是极具潜力的分布式账本平台的核心技术。如果你还不了解区块链，可以阅读 [区块链技术指南](https://www.gitbook.com/book/yeasy/blockchain_guide)。
 
@@ -66,5 +66,5 @@ $ git rebase upstream/master
 $ git push -f origin master
 ```
 
-_本书结构由 _[_gitbook\_gen_](https://github.com/yeasy/code_snippet/blob/master/python/gitbook_gen.py)_ 维护。_
+_本书结构由 __[gitbook\_gen](https://github.com/yeasy/code_snippet/blob/master/python/gitbook_gen.py)__ 维护。_
 
