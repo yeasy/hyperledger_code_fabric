@@ -20,33 +20,31 @@ $ find fabric/vendor -name "*.go" | xargs cat | wc -l
 
 ### 源代码
 实现 fabric 功能的核心代码，包括：
-* accesscontrol 包
-* core 包
-* events 包
-* peer 包
-* protos 包
-* order 包；
+* [accesscontrol](accesscontrol) 包
+* [core](core) 包
+* [events](events) 包
+* [peer](peer) 包
+* [protos](protos) 包
+* [order](order) 包；
 
 ### 源码相关工具
 一些辅助代码包，包括：
 
-* vendor 包：管理依赖；
-* bddtests：测试包；
-* gotools：golang 开发相关工具安装；
+* [vendor](vendor) 包：管理依赖；
+* [bddtests](bddtests)：测试包；
+* [gotools](gotools)：golang 开发相关工具安装；
 
 ### 安装部署
 包括：
 
-* scripts：各种安装配置脚本；
-* devenv：配置开发环境；
-* images：镜像生成模板等。
+* [scripts](scripts)：各种安装配置脚本；
+* [devenv](devenv)：配置开发环境；
+* [images](images)：镜像生成模板等。
 
 ### 其它工具
 其他工具，包括：
 
-* docs：文档；
-
-
+* [docs](docs)：文档；
 
 
 ## 配置、脚本和文档
