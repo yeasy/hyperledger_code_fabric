@@ -26,10 +26,12 @@ $ find fabric/vendor -name "*.go" | xargs cat | wc -l
 * [events](events) 包：支持 event 框架；
 * [examples](examples) 包：包括一些示例的 chaincode 代码；
 * [flogging](flogging) 包：封装 go-logging，提供日志支持；
-
+* [gossip](gossip) 包：实现 gossip 协议；
+* [metadata](metadata) 包：版本信息等；
+* [msp](msp) 包：Memberservice provider 包；
+* [order](order) 包：order 服务相关的入口和框架代码；
 * [peer](peer) 包：peer 的入口和框架代码；
 * [protos](protos) 包：包括各种协议和消息的 protobuf 定义文件；
-* [order](order) 包：order 服务相关的入口和框架代码；
 
 ### 源码相关工具
 一些辅助代码包，包括：
