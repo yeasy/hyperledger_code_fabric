@@ -28,7 +28,9 @@ $ find fabric/vendor -name "*.go" | xargs cat | wc -l
 
 除了些目录外，还包括一些说明文档、安装需求说明、License 信息文件等。
 
+### Docker 相关文件
 * .baseimage-release：生成 baseimage 时候的版本号。
+* docker-env.mk：生成 Docker 镜像时的环节变量。
 * .dockerignore：生成 Docker 镜像时忽略一些目录，包括 .git 目录。
 
 ### git 相关文件
