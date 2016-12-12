@@ -117,7 +117,6 @@
     * [util.go](bddtests/util_go.md)
     * [utxo.feature](bddtests/utxo_feature.md)
 * [busybox](busybox/README.md)
-    * [Makefile](busybox/Makefile.md)
 * [core](core/README.md)
     * [chaincode](core/chaincode/README.md)
         * [platforms](core/chaincode/platforms/README.md)
