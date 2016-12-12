@@ -9,13 +9,7 @@ Hyperledger Fabric 在 1.0 中，架构已经解耦为三部分：
 其中，fabric-peer 和 fabric-order 代码暂时都在 fabric 项目中，未来可能进一步拆分。
 
 ## 核心代码
-fabric 源代码主要分为如下三部分：
-
-* 源代码：实现 fabric 功能的核心代码，包括 accesscontrol 包、core 包、events 包、peer 包、protos 包、order 包；
-* 源码相关工具：一些辅助代码包，包括管理依赖的 vendor 包，测试包 bddtests 等；
-* 其它工具：包括文档、安装脚本 scripts、devenv 等。
-
-源代码目前约为 80K 行。
+fabric 源代码目前约为 80K 行，主要包括代码、工具、脚本等部分。
 
 ```sh
 $ find fabric -name "*.go" | xargs cat | wc -l
@@ -23,6 +17,37 @@ $ find fabric -name "*.go" | xargs cat | wc -l
 $ find fabric/vendor -name "*.go" | xargs cat | wc -l
 410294
 ```
+
+### 源代码
+实现 fabric 功能的核心代码，包括：
+* accesscontrol 包
+* core 包
+* events 包
+* peer 包
+* protos 包
+* order 包；
+
+### 源码相关工具
+一些辅助代码包，包括：
+
+* vendor 包：管理依赖；
+* bddtests：测试包；
+* gotools：golang 开发相关工具安装；
+
+### 安装部署
+包括：
+
+* scripts：各种安装配置脚本；
+* devenv：配置开发环境；
+* images：镜像生成模板等。
+
+### 其它工具
+其他工具，包括：
+
+* docs：文档；
+
+
+
 
 ## 配置、脚本和文档
 
