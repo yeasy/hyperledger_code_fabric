@@ -30,16 +30,17 @@ $ find fabric/vendor -name "*.go" | xargs cat | wc -l
 ### 源码相关工具
 一些辅助代码包，包括：
 
-* [vendor](vendor) 包：管理依赖；
-* [bddtests](bddtests)：测试包；
+* [bddtests](bddtests)：测试包，含有大量 bdd 测试用例；
 * [gotools](gotools)：golang 开发相关工具安装；
+* [vendor](vendor) 包：管理依赖；
 
 ### 安装部署
 包括：
 
-* [scripts](scripts)：各种安装配置脚本；
+* [busybox](busybox)：busybox 环境，精简的 linux；
 * [devenv](devenv)：配置开发环境；
 * [images](images)：镜像生成模板等。
+* [scripts](scripts)：各种安装配置脚本；
 
 ### 其它工具
 其他工具，包括：
