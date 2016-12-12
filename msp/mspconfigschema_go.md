@@ -1,0 +1,1 @@
+## mspconfigschema.go
