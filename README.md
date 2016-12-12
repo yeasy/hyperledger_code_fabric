@@ -1,6 +1,6 @@
 # Hyperledger 源码分析之 Fabric
 
-0.3.2
+0.4.0
 
 区块链技术是计算机技术与金融技术交融的成功创新，被认为是极具潜力的分布式账本平台的核心技术。如果你还不了解区块链，可以阅读 [区块链技术指南](https://www.gitbook.com/book/yeasy/blockchain_guide)。
 
@@ -8,15 +8,15 @@
 
 在线阅读：[GitBook](https://www.gitbook.com/book/yeasy/hyperledger_code_fabric) 或 [GitHub](https://github.com/yeasy/hyperledger_code_fabric/blob/master/SUMMARY.md)。
 
-欢迎大家加入区块链技术讨论群：
+欢迎大家加入 [区块链技术讨论群](https://www.gitbook.com/book/yeasy/blockchain_guide)。
 
-* QQ 群：335626996
 
 ## 版本历史
 
-* 0.4.0: 2016-MM-DD
+* 0.4.0: 2016-12-12
 
-  * TODO
+  * 完成 0.6 分支；
+  * 开始 1.0 分支新架构代码。
 
 * 0.3.0: 2016-08-04
 
