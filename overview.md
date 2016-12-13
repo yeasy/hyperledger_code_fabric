@@ -51,7 +51,7 @@ $ find fabric/vendor -name "*.go" | xargs cat | wc -l
 ### 其它工具
 其他工具，包括：
 
-* [docs](docs)：文档；
+* [docs](docs)：文档，大部分文档都可以 [在线查阅](http://hyperledger-fabric.readthedocs.io)；
 
 
 ## 配置、脚本和文档
