@@ -21,8 +21,9 @@ $ find fabric/vendor -name "*.go" | xargs cat | wc -l
 ### 源代码
 实现 fabric 功能的核心代码，包括：
 
-* [accesscontrol](accesscontrol) 包；
-* [core](core) 包：一些核心的功能模块；
+* [accesscontrol](accesscontrol) 包：实现对 chaincode 的权限管理和证书校验等；
+* [common](common) 包：一些通用的模块；
+* [core](core) 包：大部分核心实现代码都在本包下。其它包的代码封装上层接口，最终调用本包内代码；
 * [events](events) 包：支持 event 框架；
 * [examples](examples) 包：包括一些示例的 chaincode 代码；
 * [flogging](flogging) 包：封装 go-logging，提供日志支持；
