@@ -1020,5 +1020,3 @@
 * [README.md](README_md.md)
 * [settings.gradle](settings_gradle.md)
 * [TravisCI_Readme.md](TravisCI_Readme_md.md)
-* [其它文件](others.md)
-
