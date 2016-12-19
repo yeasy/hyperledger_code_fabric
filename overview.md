@@ -61,7 +61,6 @@ $ find fabric/vendor -name "*.go" | xargs cat | wc -l
 
 ### Docker 相关文件
 * .baseimage-release：生成 baseimage 时候的版本号。
-* docker-env.mk：生成 Docker 镜像时的环节变量。
 * .dockerignore：生成 Docker 镜像时忽略一些目录，包括 .git 目录。
 
 ### git 相关文件
@@ -75,7 +74,8 @@ $ find fabric/vendor -name "*.go" | xargs cat | wc -l
 
 ### 其它
 * LICENSE：Apache 2 许可文件。
-* Makefile：执行测试、格式检查、安装依赖、生成镜像 等等。
+* docker-env.mk：被 Makefile 引用，生成 Docker 镜像时的环节变量。
+* Makefile：执行测试、格式检查、安装依赖、生成镜像等操作。
 * mkdocs.yml：生成 http://hyperledger-fabric.readthedocs.io 在线文档的配置文件。
 * TravisCI_Readme.md
 
