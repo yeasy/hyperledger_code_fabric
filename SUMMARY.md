@@ -1011,12 +1011,4 @@
             * [yamlh.go](vendor/gopkg.in/yaml.v2/yamlh_go.md)
             * [yamlprivateh.go](vendor/gopkg.in/yaml.v2/yamlprivateh_go.md)
     * [vendor.json](vendor/vendor_json.md)
-* [docker-env.mk](docker-env_mk.md)
-* [fabric.sublime-project](fabric_sublime-project.md)
-* [fabric.sublime-workspace](fabric_sublime-workspace.md)
-* [LICENSE](LICENSE.md)
-* [Makefile](Makefile.md)
-* [mkdocs.yml](mkdocs_yml.md)
-* [settings.gradle](settings_gradle.md)
-* [TravisCI\_Readme.md](TravisCI_Readme_md.md)
 
