@@ -1,1 +1,0 @@
-### sec-futrel-depl.png

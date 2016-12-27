@@ -1,1 +1,0 @@
-### manager_test.go

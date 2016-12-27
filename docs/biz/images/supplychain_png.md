@@ -1,1 +1,0 @@
-#### supplychain.png

@@ -1,1 +1,0 @@
-### sec-sec-arch.png

@@ -1,1 +1,0 @@
-### committer_test.go

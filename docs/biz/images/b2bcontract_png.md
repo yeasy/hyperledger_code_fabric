@@ -1,1 +1,0 @@
-#### b2bcontract.png

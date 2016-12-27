@@ -1,1 +1,0 @@
-### systemchaincode_test.go

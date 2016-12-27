@@ -1,1 +1,0 @@
-#### readerc.go

@@ -1,1 +1,0 @@
-### sec-firstrel-depl.png

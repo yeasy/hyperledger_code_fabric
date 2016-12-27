@@ -1,1 +1,0 @@
-#### sharedconfig_test.go

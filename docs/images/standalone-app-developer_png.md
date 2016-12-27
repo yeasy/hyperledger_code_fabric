@@ -1,1 +1,0 @@
-### standalone-app-developer.png

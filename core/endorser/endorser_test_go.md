@@ -1,1 +1,0 @@
-### endorser_test.go

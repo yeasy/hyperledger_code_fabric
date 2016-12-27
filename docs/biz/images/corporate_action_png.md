@@ -1,1 +1,0 @@
-#### corporate_action.png

@@ -1,1 +1,0 @@
-### sec-usrconf-invoke.png

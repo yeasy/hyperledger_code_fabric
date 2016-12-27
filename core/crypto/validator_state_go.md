@@ -1,1 +1,0 @@
-### validator_state.go
