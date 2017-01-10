@@ -1,0 +1,1 @@
+## hashopts.go

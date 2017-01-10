@@ -1,0 +1,1 @@
+### ccchecker.json
