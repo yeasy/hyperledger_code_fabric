@@ -1,1 +1,0 @@
-### msgvalidation.go

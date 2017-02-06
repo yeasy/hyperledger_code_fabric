@@ -1,1 +1,0 @@
-### chain-config.proto

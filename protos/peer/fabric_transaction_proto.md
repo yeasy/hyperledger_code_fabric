@@ -1,1 +1,0 @@
-### fabric_transaction.proto

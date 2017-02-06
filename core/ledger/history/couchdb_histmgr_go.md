@@ -1,1 +1,0 @@
-#### couchdb_histmgr.go
