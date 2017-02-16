@@ -1,1 +1,0 @@
-#### orderer_types.go
