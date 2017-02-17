@@ -1,3 +1,5 @@
 # msp
 
-member service provider，封装对 fabric-ca 的接口。
+成员服务提供者（Member Service Provider），提供一组认证相关的密码学机制和协议，用来负责对网络提供证书分发、校验，身份认证管理等。
+
+通常情况下，一个组织可以作为一个 MSP，负责对旗下所有成员的管理。
