@@ -3,13 +3,13 @@
 Hyperledger Fabric 在 1.0 中，架构已经解耦为三部分：
 
 * fabric-peer：主要起到 peer 作用，包括 endorser、committer 两种角色；
-* fabric-cop：即原先的 membersrvc，独立成一个新的项目。
+* fabric-ca：即原先的 membersrvc，独立成一个新的项目。
 * fabric-order：起到 order 作用。
 
 其中，fabric-peer 和 fabric-order 代码暂时都在 fabric 项目中，未来可能进一步拆分。
 
 ## 核心代码
-fabric 源代码目前约为 117K 行，主要包括代码、工具、脚本等部分。
+fabric 核心源代码目前约为 117K 行，主要包括代码、工具、脚本等部分。
 
 ```sh
 $ find fabric -name "*.go" -not -path "fabric/vendor/*" | xargs cat | wc -l
@@ -19,7 +19,7 @@ $ find fabric -name "*.go" -not -path "fabric/vendor/*" | xargs cat | wc -l
 ### 源代码
 实现 fabric 功能的核心代码，包括：
 
-* [accesscontrol](accesscontrol) 包：实现对 chaincode 的权限管理和证书校验等；
+* [accesscontrol](accesscontrol) 包：实现对 chaincode 的权限管理和属性校验等；
 * [common](common) 包：一些通用的模块；
 * [core](core) 包：大部分核心实现代码都在本包下。其它包的代码封装上层接口，最终调用本包内代码；
 * [events](events) 包：支持 event 框架；
@@ -27,7 +27,7 @@ $ find fabric -name "*.go" -not -path "fabric/vendor/*" | xargs cat | wc -l
 * [flogging](flogging) 包：封装 go-logging，提供日志支持；
 * [gossip](gossip) 包：实现 gossip 协议；
 * [metadata](metadata) 包：版本信息等；
-* [msp](msp) 包：Memberservice provider 包；
+* [msp](msp) 包：Member Service Provider 包；
 * [order](order) 包：order 服务相关的入口和框架代码；
 * [peer](peer) 包：peer 的入口和框架代码；
 * [protos](protos) 包：包括各种协议和消息的 protobuf 定义文件；
