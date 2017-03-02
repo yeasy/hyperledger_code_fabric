@@ -1,1 +1,0 @@
-#### anchorPeersBadFormat.txt
