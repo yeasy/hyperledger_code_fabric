@@ -563,6 +563,7 @@
         * [orderingservice.rst](docs/source/orderingservice_rst.md)
         * [overview.rst](docs/source/overview_rst.md)
         * [paper.rst](docs/source/paper_rst.md)
+        * [peer-chaincode-devmode.rst](docs/source/peer-chaincode-devmode_rst.md)
         * [pluggableos.rst](docs/source/pluggableos_rst.md)
         * [policies.rst](docs/source/policies_rst.md)
         * [protocol-spec.rst](docs/source/protocol-spec_rst.md)
