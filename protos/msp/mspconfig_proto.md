@@ -1,1 +1,0 @@
-### mspconfig.proto

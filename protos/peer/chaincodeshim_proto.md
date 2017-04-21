@@ -1,1 +1,0 @@
-### chaincodeshim.proto
