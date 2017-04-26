@@ -24,3 +24,21 @@ err = mspmgmt.LoadLocalMsp(conf.General.LocalMSPDir, conf.General.BCCSP, conf.Ge
 ```
 
 随后，是否需要从外部 genesis 区块文件读入数据，还是根据给定配置初始化 genesis 区块结构。
+
+最后是初始化各个账本结构，并注册 server 和 signer 两个组件到 grpc server 上。
+
+```golang
+signer := localmsp.NewSigner()
+
+	manager := multichain.NewManagerImpl(lf, consenters, signer)
+
+	server := NewServer(
+		manager,
+		signer,
+	)
+
+	ab.RegisterAtomicBroadcastServer(grpcServer.Server(), server)
+	logger.Info("Beginning to serve requests")
+	grpcServer.Start()
+```
+
