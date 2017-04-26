@@ -1,10 +1,10 @@
 ## sampleconfig
 
-提供了一些样例证书文件。
+提供了一些样例证书文件和配置文件。
 
 pem （Privacy Enhanced Mail，属于 X.509 证书标准格式）格式，内容是 BASE64 编码，可以通过 openssl 来查看内容。
 
-如 
+如
 
 ```sh
 $ openssl x509 -in msp/sampleconfig/admincerts/admincert.pem -text -noout
@@ -45,3 +45,6 @@ Certificate:
         02:20:40:07:b8:38:e2:98:84:97:61:dd:fe:d4:45:a2:9f:19:
         37:f8:f7:6f:e7:99:19:ad:2b:ec:92:2a:3a:47:4a:b5
 ```
+
+
+
