@@ -5,6 +5,10 @@
 
 一种是通用的方式，通过传入的参数进行打包；一种是直接读入传入的打包文件 ccpackfile 进行处理。
 
-首先都生成一个 ChaincodeDeploymentSpec 结构（其中包括所调用的 chaincode 目录代码和所需要的环境代码，打包为 tar 格式），然后通过 install 方法，转化为一个 protobuf 消息，发送给 peer。
+首先将 chaincode 相关数据生成一个 ChaincodeDeploymentSpec 结构，然后通过 install 方法，转化为一个 protobuf 消息，发送给 peer。
+
+#### 生成 ChaincodeDeploymentSpec 结构
 
 ![ChaincodeDeploymentSpec 结构](../_images/proto-peer-chaincode.png)
+
+其中，ChaincodeDeploymentSpec 结构的 CodePackage 变量包括所调用的 chaincode 的代码和所需要的环境代码（例如整个 $GOPATH/src 目录下数据），为 tar 格式的二进制数据。
