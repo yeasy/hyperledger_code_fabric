@@ -13,13 +13,13 @@ main 函数主要完成命令的注册和一些初始化配置工作。
 
 首先，从本地的 yaml、环境变量以及命令行选项中读取配置信息；之后注册各个子命令；最后初始化 MSP 部分。
 
-peer 的 MSP 文件路径在 `peer.mspConfigPath`；默认的 mspID 是 `peer.localMspId`。
+peer 的 MSP 文件路径在 `peer.mspConfigPath`（$FABRIC_CFG_PATH/msp）；默认的 mspID 是 `peer.localMspId`（DEFAULT）。
 
 ### MSP 初始化
 
 通过 peer/common/common.go 文件中的 InitCrypto 方法完成。
 
-```golang
+```go
 func InitCrypto(mspMgrConfigDir string, localMSPID string) error {
 	// Init the BCCSP
 	var bccspConfig *factory.FactoryOpts
@@ -38,4 +38,27 @@ func InitCrypto(mspMgrConfigDir string, localMSPID string) error {
 ```
 
 
+其中，默认的 BCCSP 配置从 `peer.BCCSP` 中读取，示例配置为
+
+```yaml
+BCCSP:
+        Default: SW
+        SW:
+            # TODO: The default Hash and Security level needs refactoring to be
+            # fully configurable. Changing these defaults requires coordination
+            # SHA2 is hardcoded in several places, not only BCCSP
+            Hash: SHA2
+            Security: 256
+            # Location of Key Store, can be subdirectory of SbftLocal.DataDir
+            FileKeyStore:
+                # If "", defaults to 'mspConfigPath'/keystore
+                # TODO: Ensure this is read with fabric/core/config.GetPath() once ready
+                KeyStore:
+```
+
+通过 msp/mgmt/mgmt.go 中的 LoadLocalMsp 方法来导入 MSP 相关的文件和配置。LoadLocalMsp 会先读入各种文件和初始化配置，然后按照配置进行初始化。
+
+首先，调用 msp/cofnigbuilder.go 中的 GetLocalMspConfig 方法，进一步调用 getMspConfig 方法。getMspConfig 方法导入所有提供的 PEM 格式的证书和密钥文件，并从 MSP 配置目录下查找 config.yaml 并读取 OUIdentifier 信息。
+
+之后通过 `GetLocalMSP().Setup(conf)` 进行配置。
 
