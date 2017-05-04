@@ -1,1 +1,10 @@
 ### install.go
+响应 `peer chaincode install` 命令。
+
+调用 chaincodeInstall 方法。
+
+一种是通用的方式，通过传入的参数进行打包；一种是直接读入传入的打包文件 ccpackfile 进行处理。
+
+首先都生成一个 ChaincodeDeploymentSpec 结构（其中包括所调用的 chaincode 目录代码和所需要的环境代码，打包为 tar 格式），然后通过 install 方法，转化为一个 protobuf 消息，发送给 peer。
+
+![ChaincodeDeploymentSpec 结构](../_images/proto-peer-chaincode.png)
