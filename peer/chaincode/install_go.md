@@ -5,7 +5,7 @@
 
 一种是通用的方式，通过传入的参数进行打包；一种是直接读入传入的打包文件 ccpackfile 进行处理。
 
-首先将 chaincode 相关数据生成一个 ChaincodeDeploymentSpec（CDS）结构，然后进行签名等，最后通过 install 方法，转化为一个 protobuf 消息，发送给 peer。
+首先将 chaincode 相关数据生成一个 ChaincodeDeploymentSpec（CDS）结构，然后通过 install 方法，进行签名和转化为一个 protobuf 提案消息，发送给 peer进行背书。
 
 #### 生成 ChaincodeDeploymentSpec 结构
 
@@ -14,7 +14,7 @@
 其中，ChaincodeDeploymentSpec 结构的 CodePackage 变量包括所调用的 chaincode 的代码和所需要的环境代码（例如整个 $GOPATH/src 目录下数据），为 tar 格式的二进制数据。
 
 #### 进行 endorsement
-安装之前，根据 CDS 来生成 Install Proposal。
+调用 install 方法，根据 CDS 来生成 Install Proposal。
 
 首先，从本地 MSP 中拿到签名体身份（签名体在初始化阶段完成导入，包括证书和私钥）。
 
@@ -24,4 +24,9 @@
 prop, _, err := utils.CreateInstallProposalFromCDS(msg, creator)
 ```
 
-实际调用的是 protos/utils/proputils.go 中的 createProposalFromCDS 方法。
+实际调用的是 protos/utils/proputils.go 中的 createProposalFromCDS 方法，创建一个对 LSCC 的 ChaincodeInvocationSpec，然后基于它创建一个 Proposal 结构。在此期间，需要生成 transaction id（随机生成的 nonce 值和 creator 信息，一起进行摘要）。
+
+Proposal 结构体内容被 cf.Signer 进行签名，生成 SignedProposal 消息。SignedProposal 通过 endorsement 客户端通过 grpc 发送到 peer 节点进行背书，正常会收到 ProposalResponse 消息。
+
+
+
