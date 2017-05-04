@@ -14,4 +14,14 @@
 其中，ChaincodeDeploymentSpec 结构的 CodePackage 变量包括所调用的 chaincode 的代码和所需要的环境代码（例如整个 $GOPATH/src 目录下数据），为 tar 格式的二进制数据。
 
 #### 进行 endorsement
-安装之前，根据 CDS 来生成 Install Proposal
+安装之前，根据 CDS 来生成 Install Proposal。
+
+首先，从本地 MSP 中拿到签名体身份（签名体在初始化阶段完成导入，包括证书和私钥）。
+
+首先，创建 Install Proposal。
+
+```golang
+prop, _, err := utils.CreateInstallProposalFromCDS(msg, creator)
+```
+
+实际调用的是 protos/utils/proputils.go 中的 createProposalFromCDS 方法。
