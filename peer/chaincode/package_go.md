@@ -4,10 +4,10 @@
 例如
 
 ```bash
-$ peer chaincode package -n test_cc  -o orderer0:7050 -c '{"Args":["init","a","100","b","200"]}' -v 1.1 
+$ peer chaincode package -n test_cc -c '{"Args":["init","a","100","b","200"]}' -v 1.1 
 ```
 
-命令会调用 chaincodePackage。
+命令会调用 chaincodePackage 方法。
 
 首先会调用 InitCmdFactory，初始化 Signer 等结构。这一步对于所有 chaincode 子命令来说都是类似的，个别会初始化不同的结构。
 
