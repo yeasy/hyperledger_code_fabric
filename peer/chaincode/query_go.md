@@ -22,3 +22,4 @@ chaincodeInvokeOrQuery 方法主要过程如下：
 * 成功的话，获取到 ProposalResponse，打印出 proposalResp.Response.Payload。
 
 
+注意 invoke 和 query 的区别，query 不需要创建 SignedTx 发送到 orderer，而且会返回结果。
