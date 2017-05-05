@@ -1,5 +1,5 @@
 ### install.go
-响应 `peer chaincode install` 命令，将智能合约源码和环境传输到指定的 peer 节点上，并生成智能合约的打包文件（name.version）到默认的 `/var/hyperledger/production/chaincodes/` 目录下。
+响应 `peer chaincode install` 命令，将智能合约源码和环境传输到指定的 peer 节点上，并生成智能合约的部署打包文件（name.version）到默认的 `/var/hyperledger/production/chaincodes/` 目录下。
 
 例如
 
