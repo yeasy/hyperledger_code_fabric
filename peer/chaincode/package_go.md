@@ -4,7 +4,7 @@
 例如
 
 ```bash
-$ peer chaincode package -n test_cc -c '{"Args":["init","a","100","b","200"]}' -p github.com/hyperledger/fabric/examples/chaincode/go/chaincode_example02 -v 1.1 
+$ peer chaincode package -n test_cc -c '{"Args":["init","a","100","b","200"]}' -p github.com/hyperledger/fabric/examples/chaincode/go/chaincode_example02 -v 1.0  test_cc_1.0.pkg
 ```
 
 命令会调用 chaincodePackage 方法。
@@ -15,9 +15,6 @@ $ peer chaincode package -n test_cc -c '{"Args":["init","a","100","b","200"]}' -
 
 * 根据传入的各种参数，生成 ChaincodeSpec。
 * 生成 ChaincodeDeploymentSpec 结构。
-* 根据 CDS、签名实体、策略、通道、escc、vscc 等信息，创建一个 LSCC 的 ChaincodeInvocationSpec，根据这个 CIS，添加上 TxID（随机数+签名实体，进行 hash），创建一个 Proposal 出来；
-* 根据签名实体，对 Proposal 进行签名。
-* 调用 EndorserClient，发送 gprc 消息，将签名后 Proposal 发给指定的 peer。
-* 根据 peer 的返回，创建一个 Envelop 结构（SignedTx）并进行签名。
-* 将 Envelop 通过 grpc 通道发给 orderer。
+* 根据 CDS 等创建 签名后的 ChaincodeDeploymentSpec，并封装为 Envelop 结构（其中数据是一个 SignedChaincodeDeploymentSpec）。
+* 将 Envelop 结构写到本地指定的文件中。
 
