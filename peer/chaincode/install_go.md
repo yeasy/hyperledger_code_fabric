@@ -1,11 +1,23 @@
 ### install.go
-响应 `peer chaincode install` 命令。
+响应 `peer chaincode install` 命令，将智能合约源码和环境传输到指定的 peer 节点上，并生成智能合约的打包文件（name.version）到默认的 `/var/hyperledger/production/chaincodes/` 目录下。
 
-调用 chaincodeInstall 方法。
+例如
+
+```bash
+peer chaincode install -n test_cc -p github.com/hyperledger/fabric/examples/chaincode/go/chaincode_example02 -v 1.0
+```
+
+命令调用 chaincodeInstall 方法。
 
 一种是通用的方式，通过传入的参数进行打包；一种是直接读入传入的打包文件 ccpackfile 进行处理。
 
-首先将 chaincode 相关数据生成一个 ChaincodeDeploymentSpec（CDS）结构，然后通过 install 方法，进行签名和转化为一个 protobuf 提案消息，发送给 peer进行背书。
+整体流程如下：
+
+* 首先会调用 InitCmdFactory，初始化 Endosermentclient、Signer 等结构。这一步对于所有 chaincode 子命令来说都是类似的，个别会初始化不同的结构。
+* 之后解析命令行参数，生成 ChaincodeSpec；
+* 根据 CS，结合 chaincode 相关数据生成一个 ChaincodeDeploymentSpec（CDS）结构；
+* 然后通过 install 方法，进行签名和转化为一个 protobuf 提案消息；
+* 通过 grpc 发送给 peer进行背书。
 
 #### 生成 ChaincodeDeploymentSpec 结构
 

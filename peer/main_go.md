@@ -8,10 +8,11 @@
 * chaincode：chaincode 对应子命令
 * channel：channel 对应子命令
 
+main 函数主要完成子命令的注册和一些初始化配置工作，为执行子命令准备好环境，包括：
 
-main 函数主要完成命令的注册和一些初始化配置工作。
-
-首先，从本地的 yaml、环境变量以及命令行选项中读取配置信息；之后注册各个子命令；最后初始化 MSP 部分。
+* 从本地的 yaml、环境变量以及命令行选项中读取配置信息；
+* 之后注册各个子命令；
+* 最后初始化 MSP 部分。
 
 peer 的 MSP 文件路径在 `peer.mspConfigPath`（$FABRIC_CFG_PATH/msp）；默认的 mspID 是 `peer.localMspId`（DEFAULT）。
 
