@@ -4,7 +4,7 @@
 例如
 
 ```bash
-$ peer chaincode package -n test_cc -c '{"Args":["init","a","100","b","200"]}' -v 1.1 
+$ peer chaincode package -n test_cc -c '{"Args":["init","a","100","b","200"]}' -p github.com/hyperledger/fabric/examples/chaincode/go/chaincode_example02 -v 1.1 
 ```
 
 命令会调用 chaincodePackage 方法。
