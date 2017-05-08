@@ -1,0 +1,1 @@
+### generateArtifacts.sh

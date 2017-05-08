@@ -1,1 +1,0 @@
-### generateCfgTrx.sh
