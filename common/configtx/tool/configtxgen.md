@@ -71,15 +71,15 @@ func main() {
 
 ##### doOutputBlock
 
-生成初始区块，存放到指定目录下。
+生成初始区块，存放到指定路径。
 
 * 首先调用 provisional.New(config) 根据读入的配置生成启动参数结构。
-* 调用 	genesisBlock := pgen.GenesisBlockForChannel(channelID) 生成指定通道的区块。
+* 调用 	genesisBlock := pgen.GenesisBlockForChannel(channelID) 生成指定通道的区块，核心数据是一个 ConfigEnvelope 结构。
 * 将区块文件写到本地。
 
 ##### doOutputChannelCreateTx
 
-生成创建新通道的交易，存放到指定目录下。
+生成创建新通道的交易，存放到指定路径。
 
 * 获取签名实体信息。
 * 生成创建新通道的交易结构。
@@ -87,7 +87,13 @@ func main() {
 
 ##### doInspectBlock
 
+读入区块内容，并解析为 ConfigEnvelope 结构，打印出来。
+
 ##### doInspectChannelCreateTx
 
+读入交易文件内容，并解析为 ConfigUpdateEnvelope 结构，打印出来。
+
 ##### doOutputAnchorPeersUpdate
+
+生成一个锚点 Peer 更新的 ConfigUpdateEnvelope，并存储到指定路径。
 
