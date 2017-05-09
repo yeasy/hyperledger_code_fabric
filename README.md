@@ -11,6 +11,10 @@
 欢迎大家加入 [区块链技术讨论群](https://www.gitbook.com/book/yeasy/blockchain_guide)。
 
 ## 版本历史
+* 0.6.0: 2017-XX-YY
+
+  * configtxgen 模块；
+
 * 0.5.0: 2017-05-08
 
   * 完成 peer 模块；
