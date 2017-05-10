@@ -29,6 +29,18 @@ type Handler struct {
 }
 ```
 
+chaincode 容器启动后，会调用到服务端的 Register() 方法，该方法进一步调用到 HandleChaincodeStream()
+
+```go
+// HandleChaincodeStream Main loop for handling the associated Chaincode stream
+func HandleChaincodeStream(chaincodeSupport *ChaincodeSupport, ctxt context.Context, stream ccintf.ChaincodeStream) error {
+	deadline, ok := ctxt.Deadline()
+	chaincodeLogger.Debugf("Current context deadline = %s, ok = %v", deadline, ok)
+	handler := newChaincodeSupportHandler(chaincodeSupport, stream)
+	return handler.processStream()
+}
+```
+
 #### FSM
 
 初始化是在 newChaincodeSupportHandler 方法。
