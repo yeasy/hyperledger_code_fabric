@@ -1,7 +1,7 @@
 ### handler.go
 
+#### Handler 结构
 Handler 结构，负责 Peer 响应 chaincode 容器过来的各种消息。
-
 
 ```go
 type Handler struct {
@@ -41,6 +41,11 @@ func HandleChaincodeStream(chaincodeSupport *ChaincodeSupport, ctxt context.Cont
 }
 ```
 
+newChaincodeSupportHandler 方法中会初始化 FSM。
+
+
 #### FSM
 
-初始化是在 newChaincodeSupportHandler 方法。
+![](../_images/chaincode_Handler_FSM.png)
+
+
