@@ -1,6 +1,6 @@
 #### chaincode.go
 
-提供 ChaincodeStub 结构，支持一系列对账本进行操作的方法（如 GetState、PutState），供用户链码中进行调用。
+提供 ChaincodeStub 结构，支持一系列对账本进行操作的方法（如 GetState、PutState、DelState 等），这些方法用户可以直接在链码中进行调用。
 
 ```go
 type ChaincodeStub struct {
