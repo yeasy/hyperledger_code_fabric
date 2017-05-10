@@ -23,10 +23,11 @@ type Handler struct {
 * ChatStream：跟 Peer 进行通信的 grpc 流。
 * FSM：最重要的事件处理状态机，根据收到不同事件调用不同方法。
 * cc：所面向的链码。
-* responseChannel：本地 chan，key 是 TxID，value 里面可以放上一些消息，供调用者后面使用。
-* nextState：
+* responseChannel：本地 chan。字典结构，key 是 TxID，value 里面可以放上一些消息，供调用者后面使用。
+* nextState：本地 chan，可以存放下一步要进行的操作和数据。
 
 ##### FSM
 
+![](../../_images/chaincode_shim_Handler_FSM.png)
 
 从 Payload 中解析出 ChaincodeInput 结构，利用这些信息，调用 stub.init 方法对 stub 进行初始化（配置 TxID、args、handler、signedProposal、creator、transient、binding 等成员）。之后，调用 Handler 结构成员 chaincode 
