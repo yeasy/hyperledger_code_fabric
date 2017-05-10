@@ -30,3 +30,5 @@ type Handler struct {
 ```
 
 #### FSM
+
+初始化是在 newChaincodeSupportHandler 方法。
