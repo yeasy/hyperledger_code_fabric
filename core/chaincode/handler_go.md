@@ -43,6 +43,8 @@ func HandleChaincodeStream(chaincodeSupport *ChaincodeSupport, ctxt context.Cont
 
 newChaincodeSupportHandler 方法中会初始化 FSM。
 
+之后，调用 handler.processStream() 进入对来自 chaincode 容器消息处理的主循环。
+
 
 #### FSM
 
