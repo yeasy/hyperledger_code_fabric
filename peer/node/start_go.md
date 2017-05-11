@@ -2,7 +2,7 @@
 
 负责 `peer node start` 命令。
 
-最重要的是 `func serve(args []string) error` 函数，启动一个节点服务，主要是启动各个 GRPC 的服务端。
+最重要的是 `func serve(args []string) error` 函数，启动一个节点服务，主要是启动各个 GRPC 的服务端。包括 chaincodesupport 服务、admin 服务、endorser 服务、gossip 服务。
 
 #### 配置读取和缓存
 首先是进行配置管理，根据配置信息和一些计算来构建 cache 结构，探测节点信息等。主要调用 core.peer 包来实现。
