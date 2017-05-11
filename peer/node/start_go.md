@@ -2,7 +2,17 @@
 
 负责 `peer node start` 命令。
 
-最重要的是 `func serve(args []string) error` 函数，启动一个节点服务，主要是启动各个 GRPC 的服务端。包括 chaincodesupport 服务、admin 服务、endorser 服务、gossip 服务。
+最重要的是 `func serve(args []string) error` 函数，启动一个节点服务，主要是启动各个 GRPC 的服务端。包括 EventsServer 服务、chaincodesupport 服务、admin 服务、endorser 服务、gossip 服务。
+
+* EventsServer 服务（events.producer.EventsServer）：提供 Chat GRPC 调用。
+* ChaincodeSupport（core.chaincode.ChaincodeSupport）服务：提供 Execute、Launch、Register、Stop 等方法。
+* ServerAdmin 服务（core.ServerAdmin）：提供 GetStatus、StartServer、StopServer、GetModuleLogLevel、SetModuleLogLevel 等方法。
+* Endorser 服务（core.endorser.Endorser）：提供 ProcessProposal 方法。
+* GossipService 服务（gossip.service.GossipService）：提供 NewConfigEventer、InitializeChannel、GetBlock、AddPayload 方法。
+
+
+
+startCmd() 方法调用 serve() 方法。
 
 #### 配置读取和缓存
 首先是进行配置管理，根据配置信息和一些计算来构建 cache 结构，探测节点信息等。主要调用 core.peer 包来实现。
