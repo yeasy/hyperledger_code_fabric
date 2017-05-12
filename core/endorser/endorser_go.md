@@ -16,3 +16,4 @@ type Endorser struct {
 
 * 调用 ValidateProposalMessage() 方法对签名的提案进行格式检查，主要检查 Channel头（是否合法头部类型）、签名头（是否包括了 nonce和creators 数据），检查签名域（creator是合法证书，签名是否正确）。
 * 如果是系统 CC，检查是否是可以从外部调用的三种之一：cscc、lscc 或 qscc。
+* 如果 chainID 不为空，获取对应 chain 的账本结构，检查 TxID 在账本上没出现过；对于非系统 CC，检查 ACL（签名提案在指定channel上有写权限）。
