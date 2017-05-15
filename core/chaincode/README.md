@@ -15,4 +15,4 @@ chaincode 相关，包括生成 chaincode 镜像，支持对 chaincode 的调用
 platforms 包提供具体的对 Chaincode 运行类型的支持，包括 golang、java、car 等。例如在部署的时候完成打包任务。
 
 
-![](_images/chaincode_msgs.png)
+![](../_images/chaincode_msgs.png)
