@@ -1,1 +1,0 @@
-### sec-memserv-components.png

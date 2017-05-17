@@ -1,1 +1,0 @@
-### sec-firstrel-inv.png

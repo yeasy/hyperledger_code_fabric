@@ -1,1 +1,0 @@
-### sec-usrconf-deploy.png

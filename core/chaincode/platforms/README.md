@@ -7,7 +7,10 @@
 定义了接口 Platform。
 
 ```go
-type Platform interface { ValidateSpec(spec *pb.ChaincodeSpec) error WritePackage(spec *pb.ChaincodeSpec, tw *tar.Writer) error}
+type Platform interface { 
+        ValidateSpec(spec *pb.ChaincodeSpec) error 
+        WritePackage(spec *pb.ChaincodeSpec, tw *tar.Writer) error
+      }
 ```
 
 ValidateSpec 用来对一个 chaincodeSpec 进行检查；WritePackage 根据一个 spec 来生成一个 tar 包，是对应的容器镜像内容。

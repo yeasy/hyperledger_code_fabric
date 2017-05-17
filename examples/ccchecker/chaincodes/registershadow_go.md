@@ -1,0 +1,1 @@
+#### registershadow.go

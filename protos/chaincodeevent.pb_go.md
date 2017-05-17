@@ -1,1 +1,0 @@
-## chaincodeevent.pb.go

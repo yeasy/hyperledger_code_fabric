@@ -1,1 +1,0 @@
-### sec-registration-detailed.png

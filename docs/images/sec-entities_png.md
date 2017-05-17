@@ -1,1 +1,0 @@
-### sec-entities.png

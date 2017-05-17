@@ -40,3 +40,11 @@ $ protoc \
 path/to/file.proto
 ```
 
+另外，生成的结构体，一般都至少默认支持 4 个默认生成的方法。
+
+* Reset()：重置结构体。
+* String() string：返回代表对象的字符串。
+* ProtoMessage()：协议消息。
+* Descriptor([]byte, []int)：描述信息。
+
+
