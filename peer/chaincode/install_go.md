@@ -14,10 +14,10 @@ peer chaincode install -n test_cc -p github.com/hyperledger/fabric/examples/chai
 整体流程如下：
 
 * 首先会调用 InitCmdFactory，初始化 Endosermentclient、Signer 等结构。这一步对于所有 chaincode 子命令来说都是类似的，个别会初始化不同的结构。
-* 之后解析命令行参数，生成 ChaincodeSpec；
-* 根据 CS，结合 chaincode 相关数据生成一个 ChaincodeDeploymentSpec（CDS）结构；
-* 然后通过 install 方法，进行签名和转化为一个 protobuf 提案消息；
-* 通过 grpc 发送给 peer进行背书。
+* 调用 chaincodeInstall 方法，解析命令行参数，生成 ChaincodeSpec；
+* 根据 CS，结合 chaincode 相关数据生成一个 ChaincodeDeploymentSpec（CDS）结构（chainID 为空），并传入 install 方法；
+* install 方法基于传入的 CDS，生成一个 install 类型的 Proposal，进行签名和转化为一个 protobuf 提案消息；
+* 通过 EndorserClient 经由 grpc 通道发送给 peer 进行背书。
 
 #### 生成 ChaincodeDeploymentSpec 结构
 
