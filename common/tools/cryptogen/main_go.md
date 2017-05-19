@@ -91,7 +91,7 @@ peerOrganizations：
 
 GenerateVerifyingMSP()会生成组织的 MSP 信息。
 
-generateNodes 会针对每个实体生成所需要的 msp 和 tls 信息，证书都会被组织根证书签名。
+generateNodes 会针对每个实体生成所需要的 msp 和 tls 信息，证书都会被组织根证书签名，信任的根都是组织 CA 证书。
 
 ###### orderer 组织
 跟 peer 组织类似过程。
