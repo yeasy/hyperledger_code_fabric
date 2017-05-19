@@ -48,7 +48,7 @@ peerOrganizations：
 * org1
   * ca：存放组织的根证书和对应的私钥文件，默认采用 EC 算法，证书为自签名。组织内的实体将基于该根证书作为相同的证书根。
   * msp：存放代表该组织的身份信息
-    * admincerts：组织管理员的证书。
+    * admincerts：组织管理员的身份验证证书。
     * cacerts：组织的根证书。
     * keystore：组织的私钥文件，用来签名。
     * signcerts：组织的签名验证证书。
