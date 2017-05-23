@@ -51,3 +51,6 @@ newChaincodeSupportHandler 方法中会初始化 FSM。
 ![](../_images/chaincode_Handler_FSM.png)
 
 
+下面是 FSM 可能会触发的方法，每个方法首先都会从 e.Args[0] 尝试解析 ChaincodeMessage 结构，如果失败则退出，成功则继续。
+
+* beforeRegisterEvent：收到来自链码容器的 ChaincodeMessage_REGISTER 注册消息，注册到本地的一个 handler 结构，返回 ChaincodeMessage_REGISTERED 消息给链码容器。
