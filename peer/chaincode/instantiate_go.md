@@ -17,7 +17,7 @@ instantiate 支持包括 policy、channel、escc、vscc 在内更多的命令行
 
 * 根据传入的各种参数，生成 ChaincodeSpec，注意 instantiate 和 upgrade 是支持 policy、escc、vscc 等参数。
 * 生成 ChaincodeDeploymentSpec 结构。
-* 根据 CDS、签名实体、策略、通道、escc、vscc 等信息，创建一个 LSCC 的 ChaincodeInvocationSpec，根据这个 CIS，添加上 TxID（随机数+签名实体，进行 hash），创建一个 Proposal 出来；
+* 根据 CDS、签名实体、策略、通道、escc、vscc 等信息，创建一个 LSCC 的 ChaincodeInvocationSpec，根据这个 CIS，添加上 TxID（随机数+签名实体，进行 hash），创建一个 Proposal 出来。
 * 根据签名实体，对 Proposal 进行签名。
 * 调用 EndorserClient，发送 gprc 消息，将签名后 Proposal 发给指定的 peer。
 * 根据 peer 的返回，创建一个 Envelop 结构并进行签名。
