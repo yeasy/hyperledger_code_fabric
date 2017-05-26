@@ -2,6 +2,8 @@
 
 join 过程也十分简单，主要是 peer 完成。
 
+同样的，首先通过 InitCmdFactory 进行初始化。
+
 ![Signed Proposal 结构](../_images/signed_proposal.png)
 
 * 客户端创建一个 ChaincodeSpec 结构，其 input 中调用方式是 CSCC.JoinChain，参数为所加入通道的初始区块。
