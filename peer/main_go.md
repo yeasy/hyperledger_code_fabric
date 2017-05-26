@@ -18,7 +18,7 @@ peer 的 MSP 文件路径从 `peer.mspConfigPath` 变量读取（相对路径，
 
 ### MSP 初始化
 
-![MSP 配置结构](../_images/mspconfig.png)
+![MSP 配置结构](_images/mspconfig.png)
 
 通过 peer/common/common.go 文件中的 InitCrypto 方法完成。
 
