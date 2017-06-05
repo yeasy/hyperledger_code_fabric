@@ -9,11 +9,14 @@ Hyperledger Fabric 在 1.0 中，架构已经解耦为三部分：
 其中，fabric-peer 和 fabric-order 代码暂时都在 fabric 项目中，未来可能进一步拆分。
 
 ## 核心代码
-fabric 核心源代码目前约为 117K 行，主要包括代码、工具、脚本等部分。
+fabric 项目中主要包括代码、工具、脚本等部分，核心源代码目前约为 713K 行。
 
 ```sh
-$ find fabric -name "*.go" -not -path "fabric/vendor/*" | xargs cat | wc -l
-116826
+$ find fabric \
+    -name "*.go"  \
+    -not -name "*_test.go" \
+    -not -path "fabric/vendor/*" | xargs cat | wc -l
+713167
 ```
 
 ### 源代码
