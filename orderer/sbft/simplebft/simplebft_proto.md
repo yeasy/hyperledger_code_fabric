@@ -1,1 +1,0 @@
-#### simplebft.proto

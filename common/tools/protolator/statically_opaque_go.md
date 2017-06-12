@@ -1,0 +1,1 @@
+#### statically_opaque.go
