@@ -5,21 +5,33 @@
 
 ```go
 func main() {
-	conf := config.Load()
-	initializeLoggingLevel(conf)
-	initializeProfilingService(conf)
-	grpcServer := initializeGrpcServer(conf)
-	initializeLocalMsp(conf)
-	signer := localmsp.NewSigner()
-	manager := initializeMultiChainManager(conf, signer)
-	server := NewServer(manager, signer)
-	ab.RegisterAtomicBroadcastServer(grpcServer.Server(), server)
-	logger.Info("Beginning to serve requests")
-	grpcServer.Start()
+
+	kingpin.Version("0.0.1")
+	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
+
+	// "start" command
+	case start.FullCommand():
+		logger.Infof("Starting %s", metadata.GetVersionInfo())
+		conf := config.Load()
+		initializeLoggingLevel(conf)
+		initializeProfilingService(conf)
+		grpcServer := initializeGrpcServer(conf)
+		initializeLocalMsp(conf)
+		signer := localmsp.NewSigner()
+		manager := initializeMultiChainManager(conf, signer)
+		server := NewServer(manager, signer)
+		ab.RegisterAtomicBroadcastServer(grpcServer.Server(), server)
+		logger.Info("Beginning to serve requests")
+		grpcServer.Start()
+	// "version" command
+	case version.FullCommand():
+		fmt.Println(metadata.GetVersionInfo())
+	}
+
 }
 ```
 
-其中，initializeLocalMsp()和initializeMultiChainManager()做了大部分的工作。
+其中，initializeLocalMsp() 和 initializeMultiChainManager()做了大部分的工作。
 
 
 ### initializeGrpcServer
@@ -67,3 +79,59 @@ signer := localmsp.NewSigner()
 ```
 
 ### initializeMultiChainManager
+
+初始化一个 multichain.Manager 结构。十分核心的代码。
+
+通过 createLedgerFactory() 初始化账本结构，包括 file、json、ram 等类型。file 的话会在本地指定目录（/var/production/chains）下创建账本结构。账本所关联的链名称会自动命名为 chain_FILENAME。之后通过指定初始区块，或自动生成来初始化区块链结构。至此，账本结构初始化完成。
+
+接下来，初始化 consenter 部分，初始化 solo、kafka 两种类型。
+
+账本、consenter，再加上传入的签名者结构，通过 NewManagerImpl() 方法构造一个 multichain.Manager 结构，负责处理消息。并且会挨个检查区块链结构，调用 start 方法启动。
+
+### NewServer
+
+新建一个 Server 结构，包括一个 broadcast 的处理句柄，以及一个 deliver 的处理句柄。
+
+```go
+type server struct {
+	bh broadcast.Handler
+	dh deliver.Handler
+}
+```
+
+NewServer 分别初始化这两个句柄，挂载上前面初始化的 multichain.Manager 结构。broadcast 句柄还需要初始化一个配置更新的处理器，负责处理 CONFIG_UPDATE 交易。
+
+```go
+func NewServer(ml multichain.Manager, signer crypto.LocalSigner) ab.AtomicBroadcastServer {
+	s := &server{
+		dh: deliver.NewHandlerImpl(deliverSupport{Manager: ml}),
+		bh: broadcast.NewHandlerImpl(broadcastSupport{
+			Manager:               ml,
+			ConfigUpdateProcessor: configupdate.New(ml.SystemChannelID(), configUpdateSupport{Manager: ml}, signer),
+		}),
+	}
+	return s
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
