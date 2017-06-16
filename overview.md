@@ -9,31 +9,39 @@ Hyperledger Fabric 在 1.0 中，架构已经解耦为三部分：
 其中，fabric-peer 和 fabric-order 代码暂时都在 fabric 项目中，未来可能进一步拆分。
 
 ## 核心代码
-fabric 项目中主要包括代码、工具、脚本等部分，核心源代码目前约为 713K 行。
+fabric 项目中主要包括代码、工具、脚本等部分，核心源代码目前约为 430 个文件，80K 行。
 
 ```sh
-$ find fabric \
+$ cd fabric
+$ find bccsp common core events gossip msp orderer peer protos \
+    -not -path "*/vendor/*" \
     -name "*.go"  \
     -not -name "*_test.go" \
-    -not -path "fabric/vendor/*" | xargs cat | wc -l
-713167
+    | wc -l
+431
+$ find bccsp common core events gossip msp orderer peer protos \
+    -not -path "*/vendor/*" \
+    -name "*.go"  \
+    -not -name "*_test.go" \
+    | xargs cat | wc -l
+80560
 ```
 
 ### 源代码
 实现 fabric 功能的核心代码，包括：
 
-* [accesscontrol](accesscontrol) 包：实现对 chaincode 的权限管理和属性校验等；
-* [common](common) 包：一些通用的模块；
-* [core](core) 包：大部分核心实现代码都在本包下。其它包的代码封装上层接口，最终调用本包内代码；
-* [events](events) 包：支持 event 框架；
-* [examples](examples) 包：包括一些示例的 chaincode 代码；
-* [flogging](flogging) 包：封装 go-logging，提供日志支持；
-* [gossip](gossip) 包：实现 gossip 协议；
-* [metadata](metadata) 包：版本信息等；
-* [msp](msp) 包：Member Service Provider 包；
-* [order](order) 包：order 服务相关的入口和框架代码；
-* [peer](peer) 包：peer 的入口和框架代码；
-* [protos](protos) 包：包括各种协议和消息的 protobuf 定义文件；
+* [bccsp](bccsp/README.md) 包：实现对加解密算法和机制的支持。
+* [common](common/README.md) 包：一些通用的模块；
+* [core](core/README.md) 包：大部分核心实现代码都在本包下。其它包的代码封装上层接口，最终调用本包内代码；
+* [events](events/README.md) 包：支持 event 框架；
+* [examples](examples/README.md) 包：包括一些示例的 chaincode 代码；
+* [flogging](flogging/README.md) 包：封装 go-logging，提供日志支持；
+* [gossip](gossip/README.md) 包：实现 gossip 协议；
+* [metadata](metadata/README.md) 包：版本信息等；
+* [msp](msp/README.md) 包：Member Service Provider 包；
+* [order](order/README.md) 包：order 服务相关的入口和框架代码；
+* [peer](peer/README.md) 包：peer 的入口和框架代码；
+* [protos](protos/README.md) 包：包括各种协议和消息的 protobuf 定义文件；
 
 ### 源码相关工具
 一些辅助代码包，包括：
