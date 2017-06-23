@@ -1,6 +1,6 @@
 ## keystore.go
 
-定义 KeyStore 接口，存储加密秘钥。
+定义 KeyStore 接口，存储秘钥。
 
 ```golang
 type KeyStore interface {
