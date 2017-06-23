@@ -1,1 +1,0 @@
-### adminops.rst
