@@ -2,7 +2,7 @@
 
 实现 Policy 相关的数据结构和方法。
 
-fabric 中，策略分为签名策略（SignaturePolicy）和隐式策略（ImplicitMetaPolicy）。
+fabric 中，策略主要分为签名策略（SignaturePolicy）和隐式策略（ImplicitMetaPolicy）两种。
 
 最常见的签名策略采用 SignaturePolicyEnvelope 结构来表达。定义在 [protos/common/policies.go](protos/common/policies.go)中。
 
