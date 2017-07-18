@@ -35,13 +35,11 @@ $ find bccsp common core events gossip msp orderer peer protos \
 * [core](core/README.md) 包：大部分核心实现代码都在本包下。其它包的代码封装上层接口，最终调用本包内代码；
 * [events](events/README.md) 包：支持 event 框架；
 * [examples](examples/README.md) 包：包括一些示例的 chaincode 代码；
-* [flogging](flogging/README.md) 包：封装 go-logging，提供日志支持；
 * [gossip](gossip/README.md) 包：实现 gossip 协议；
-* [metadata](metadata/README.md) 包：版本信息等；
 * [msp](msp/README.md) 包：Member Service Provider 包；
 * [order](order/README.md) 包：order 服务相关的入口和框架代码；
 * [peer](peer/README.md) 包：peer 的入口和框架代码；
-* [protos](protos/README.md) 包：包括各种协议和消息的 protobuf 定义文件；
+* [protos](protos/README.md) 包：包括各种协议和消息的 protobuf 定义文件和生成的 go 文件。
 
 ### 源码相关工具
 一些辅助代码包，包括：
