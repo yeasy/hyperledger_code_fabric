@@ -1,6 +1,6 @@
 ### applicationorg.go
 
-主要提供三个重要的数据结构，代表应用组织。
+主要提供三个重要的数据结构，代表应用[组织](/common/config/organization_go.md)。
 
 ```go
 type ApplicationOrgProtos struct {
