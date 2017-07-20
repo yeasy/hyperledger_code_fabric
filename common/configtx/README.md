@@ -1,2 +1,2 @@
 ## configtx
-负责 config 类型的 transaction 的处理。
+负责 config transaction（新建或更新）相关的数据结构和处理。
