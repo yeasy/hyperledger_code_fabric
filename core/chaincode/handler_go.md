@@ -154,3 +154,7 @@ Peer 侧维护一个到 cc 的双向流，循环处理消息。主要在 `func (
 #### FSM 
 
 定义的状态、事件主要在 `func newChaincodeSupportHandler(chaincodeSupport *ChaincodeSupport, peerChatStream ccintf.ChaincodeStream) *Handler ` 方法中。
+
+一般对应 GET_STATE、GET_STATE_BY_RANGE 等简单事件，调用 handleXXX 方法。
+
+PUT_STATE、DEL_STATE、INVOKE_CHAINCODE 三个事件，则会触发 enterBusyState() 方法。
