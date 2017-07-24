@@ -45,7 +45,7 @@ newChaincodeSupportHandler 方法中会初始化 FSM。
 
 之后，调用 handler.processStream() 进入对来自 chaincode 容器消息处理的主循环。	
 
-#### 主消息循环
+#### handler.processStream() 主消息循环
 
 Peer 侧维护一个到 cc 的双向流，循环处理消息。主要在 `func (handler *Handler) processStream() error ` 方法中（cc 到 peer 注册后会自动调用到该方法）。
 
