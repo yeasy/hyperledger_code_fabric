@@ -148,4 +148,4 @@ Peer 侧维护一个到 cc 的双向流，循环处理消息。主要在 `func (
 * `case nsInfo = <-handler.nextState`：读取切换到下个状态的附加消息。
 * `case <-handler.waitForKeepaliveTimer()`：定期发出心跳刷新消息。
 
-读取到合法消息后，会分别调用 `handler.HandleMessage(in)` 处理 cc 消息，以及检查状态切换消息（仅允许消息类型为 READY），是否要发送给 cc 侧（sendToCC 为 True）。
+读取到合法消息后，会分别调用 `handler.HandleMessage(in)` 处理 cc 消息；以及检查状态切换消息（仅允许消息类型为 READY，意味着此时 cc 在正常运行状态），是否要发送给 cc 侧（sendToCC 为 True）。
