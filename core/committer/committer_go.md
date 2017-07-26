@@ -18,3 +18,5 @@ type Committer interface {
 	Close()
 }
 ```
+
+其中，最重要的是 `Commit(block *common.Block) error` 方法，负责完成对某个区块的验证的最终确认提交。 
