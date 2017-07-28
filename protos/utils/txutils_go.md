@@ -7,4 +7,4 @@
 
 Ps. 传入的resps是一个`ProposalResponse`的数组。
 
-![交易结构](../_images/structure_of_Envlope.png)
+![交易结构](../_images/structure_of_Envelope.png)
