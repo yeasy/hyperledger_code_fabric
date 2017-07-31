@@ -6,4 +6,4 @@ Endorsement System Chaincode
 
 目前只有签名功能，以后会扩展。
 
-进一步的分析请查阅[endorser_onevalidsignature_go.md](https://github.com/ClaudeZsb/hyperledger_code_fabric/core/scc/escc/escc_go.md)。
+进一步的分析请查阅`endorser_onevalidsignature_go.md`。
