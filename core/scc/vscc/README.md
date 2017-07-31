@@ -8,4 +8,4 @@ Validate System Chaincode
 
 特殊地，vscc中有一部分专门针对lscc的校验。
 
-进一步的分析请查阅[validator_onevalidsignature_go.md](https://github/ClaudeZsb/hyperledger_code_fabric/core/scc/vscc/validator_onevalidsignature_go.md)。
+进一步的分析请查阅[validator_onevalidsignature_go.md](https://github.com/ClaudeZsb/hyperledger_code_fabric/core/scc/vscc/validator_onevalidsignature_go.md)。
