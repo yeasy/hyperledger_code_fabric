@@ -31,19 +31,7 @@ func Main() {
 
 其中，initializeLocalMsp() 和 Start()做了大部分的工作。
 
-
-### initializeGrpcServer
-
-创建 grpc 的服务器。
-
-```golang
-grpcServer, err := comm.NewGRPCServerFromListener(lis, secureConfig)
-	if err != nil {
-		logger.Fatal("Failed to return new GRPC server:", err)
-	}
-```
-
-### initializeLocalMsp
+##### initializeLocalMsp
 
 根据 orderer.yaml 配置中路径，读取本地的 msp 数据。
 
@@ -57,23 +45,50 @@ func initializeLocalMsp(conf *config.TopLevel) {
 }
 ```
 
-随后，是否需要从外部 genesis 区块文件读入数据，还是根据给定配置初始化 genesis 区块结构。
+##### Start()
 
-最后是初始化各个账本结构，并注册 server 和 signer 两个组件到 grpc server 上。
+Start() 完成了主要的操作。
+
+首先，利用 localmsp，创建签名者结构。
+
+接下来是初始化各个账本结构。如果本地不存在旧的账本文件时，需要初始化系统通道，判断是否需要从外部 genesis 区块文件读入数据，还是根据给定配置初始化 genesis 区块结构。
+
+接下来，新建 grpc server，其中包括 Broadcast() 和 Deliver() 两个服务接口。
+
+最后，启动 grpc 服务。
 
 ```golang
-signer := localmsp.NewSigner()
+func Start(cmd string, conf *config.TopLevel) {
+	signer := localmsp.NewSigner()
+	manager := initializeMultichannelRegistrar(conf, signer)
+	server := NewServer(manager, signer, &conf.Debug)
 
-	manager := multichain.NewManagerImpl(lf, consenters, signer)
+	switch cmd {
+	case start.FullCommand(): // "start" command
+		logger.Infof("Starting %s", metadata.GetVersionInfo())
+		initializeProfilingService(conf)
+		grpcServer := initializeGrpcServer(conf)
+		ab.RegisterAtomicBroadcastServer(grpcServer.Server(), server)
+		logger.Info("Beginning to serve requests")
+		grpcServer.Start()
+	case benchmark.FullCommand(): // "benchmark" command
+		logger.Info("Starting orderer in benchmark mode")
+		benchmarkServer := performance.GetBenchmarkServer()
+		benchmarkServer.RegisterService(server)
+		benchmarkServer.Start()
+	}
+}
+```
 
-	server := NewServer(
-		manager,
-		signer,
-	)
+##### initializeGrpcServer
 
-	ab.RegisterAtomicBroadcastServer(grpcServer.Server(), server)
-	logger.Info("Beginning to serve requests")
-	grpcServer.Start()
+创建 grpc 的服务器。
+
+```golang
+grpcServer, err := comm.NewGRPCServerFromListener(lis, secureConfig)
+if err != nil {
+logger.Fatal("Failed to return new GRPC server:", err)
+}
 ```
 
 ### initializeMultiChainManager
