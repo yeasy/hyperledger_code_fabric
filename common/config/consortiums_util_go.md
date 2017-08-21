@@ -1,1 +1,0 @@
-### consortiums_util.go
