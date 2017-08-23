@@ -6,7 +6,7 @@
 * HandleChaincodeStream() 方法：对外提供初始化的 Handler 结构体，并进入循环，不断接收来自链码容器的消息。
 
 #### Handler 结构体
-Peer 侧会维护一个 Handler 结构，具体响应 chaincode 容器过来的各种消息，通过内部状态机进行处理。
+Peer 侧会为每一个 chaincode 维护一个 Handler 结构，具体响应所绑定的 chaincode 容器过来的各种消息，通过内部状态机进行处理。
 
 Handler 结构实现了 MessageHandler 接口，主要提供一个 `HandleMessage(msg *pb.ChaincodeMessage) error` 方法，作为处理各个消息的入口方法。
 
