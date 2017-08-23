@@ -1,7 +1,9 @@
 ### handler.go
 
 #### Handler 结构
-Handler 结构，负责 Peer 响应 chaincode 容器过来的各种消息。
+每一个 chaincode 实例在 Peer 侧都会维护一个 Handler 结构。它负责 Peer 响应 chaincode 容器过来的各种消息。
+
+Handler 结构实现了 MessageHandler 接口，主要提供一个 `HandleMessage(msg *pb.ChaincodeMessage) error` 方法。
 
 ```go
 type Handler struct {
@@ -29,7 +31,7 @@ type Handler struct {
 }
 ```
 
-chaincode 容器启动后，会调用到服务端的 Register() 方法，该方法进一步调用到 HandleChaincodeStream()
+chaincode 容器启动后，会调用到服务端的 Register() 方法，该方法进一步调用到 HandleChaincodeStream()。
 
 ```go
 // HandleChaincodeStream Main loop for handling the associated Chaincode stream
