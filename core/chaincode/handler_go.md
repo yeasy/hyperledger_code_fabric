@@ -36,7 +36,7 @@ type Handler struct {
 }
 ```
 
-chaincode 容器启动后，会调用到服务端的 Register() 方法，该方法进一步调用到 HandleChaincodeStream()。
+chaincode 容器启动后，会调用到服务端的 Register() 方法，该方法进一步调用到 HandleChaincodeStream()，创建 Handler 结构体，进入接收消息循环。
 
 ```go
 // HandleChaincodeStream Main loop for handling the associated Chaincode stream
