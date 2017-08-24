@@ -8,6 +8,13 @@ type Committer interface {
 	// Commit block to the ledger
 	Commit(block *common.Block) error
 
+	// CommitWithPvtData block and private data into the ledger
+	CommitWithPvtData(blockAndPvtData *ledger.BlockAndPvtData) error
+
+	// GetPvtDataAndBlockByNum retrieves block with private data with given
+	// sequence number
+	GetPvtDataAndBlockByNum(seqNum uint64) (*ledger.BlockAndPvtData, error)
+
 	// Get recent block sequence number
 	LedgerHeight() (uint64, error)
 
