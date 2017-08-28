@@ -10,9 +10,11 @@
 * Endorser 服务（core.endorser.Endorser）：提供 ProcessProposal 方法。
 * GossipService 服务（gossip.service.GossipService）：提供 NewConfigEventer、InitializeChannel、GetBlock、AddPayload 方法。
 
-
-
 startCmd() 方法调用 serve() 方法。
+
+整体流程如下图所示。
+
+![Peer node start 整体流程](../_images/peer_node_start.png)
 
 #### 配置读取和缓存
 首先是进行配置管理，根据配置信息和一些计算来构建 cache 结构，探测节点信息等。主要调用 core.peer 包来实现。
