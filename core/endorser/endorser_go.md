@@ -1,6 +1,6 @@
 ### endorser.go
 
-提供 Endorser 结构。
+提供 Endorser 结构体。
 
 ```go
 // Endorser provides the Endorser service ProcessProposal
@@ -9,9 +9,16 @@ type Endorser struct {
 }
 ```
 
-最关键的是提供了 ProcessProposal 方法，供 grpc 客户端远程调用，用来接受交易提案，进行背书处理。
+该结构体最关键的是提供了 `func (e *Endorser) ProcessProposal(ctx context.Context, signedProp *pb.SignedProposal) (*pb.ProposalResponse, error)` 方法，供客户端远程 grpc 调用。用来接受签名的交易提案（Signed Proposal），进行背书处理。
 
-#### ProcessProposal 方法
+背书过程主要完成如下操作：
+
+* 检查提案合法性；
+* 模拟执行提案（启动链码容器，对世界状态的最新版本进行临时快照，基于它执行链码，结果记录在读写集中）；
+* 对提案执行结果（读写集）进行背书（对提案内容进行签名），并返回提案响应消息。
+
+
+#### ProcessProposal 方法主要过程
 
 主要过程如下：
 
