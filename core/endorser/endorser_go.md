@@ -15,21 +15,24 @@ type Endorser struct {
 
 * 检查提案合法性；
 * 模拟执行提案（启动链码容器，对世界状态的最新版本进行临时快照，基于它执行链码，结果记录在读写集中）；
-* 对提案执行结果（读写集）进行背书（对提案内容进行签名），并返回提案响应消息。
+* 对提案进行背书（对提案内容和读写集合进行签名），并返回提案响应消息。
 
 
-#### ProcessProposal 方法主要过程
+#### ProcessProposal() 方法主要过程
 
 主要过程如下：
-
-* 调用 ValidateProposalMessage() 方法对签名的提案进行格式检查，主要检查 Channel头（是否合法头部类型）、签名头（是否包括了 nonce和creators 数据），检查签名域（creator 是合法证书，签名是否正确）。
-* 如果是系统 CC，检查是否是可以从外部调用的三种之一：cscc、lscc 或 qscc。
-* 如果 chainID 不为空，获取对应 chain 的账本结构，检查 TxID 在账本上没出现过；对于非系统 CC，检查 ACL（根据 chaincode 指定的 endorsement Policy，签名提案在指定 channel 上有写权限，最终是调用 common/cauthdsl 下面代码，支持指定必须包括某个成员来签名，或者是凑够若干几个合法签名）。
-* 如果 chainID 不为空，获取交易模拟器和历史查询器（通过 ledger 去 new txsimulator 和 historyqueryexecutor，而且交易模拟器是不包含历史信息的，所以为了查询历史需要拿到一个 historyqueryexecutor），把 historyqueryexecutor 加入到 Context 的 K-V 储存中。
-* 如果 chainID 不为空，调用 simulateProposal() 方法获取模拟执行的结果，检查返回的响应 response的状态，若不小于错误 500 则创建并返回一个失败的 ProposalResponse。
-* chainID 不为空下，调用 endorseProposal()方法对之前得到的模拟执行的结果进行背书，返回 ProposalResponse，检查 simulateProposal 返回的response 的状态，若不小于错误阈值 400（被背书节点反对），返回 ProposalResponse 及链码错误 chaincodeError（endorseProposal 里有检查链码执行结果的状态，而 simulateProposal 没有检查）。
-* 将 response.Payload 赋给 ProposalResponse.Response.Payload（因为 simulateProposal 返回的 response 里面包含链码调用的结果）。
-* 返回响应消息 ProposalResponse。
+* 检查提案合法性；
+    * 调用 ValidateProposalMessage() 方法对签名的提案进行格式检查，主要检查 Channel头（是否合法头部类型）、签名头（是否包括了 nonce和creators 数据），检查签名域（creator 是合法证书，签名是否正确）。
+    * 如果是系统 CC（SCC），检查是否是允许从外部调用的三种 SCC 之一：cscc、lscc 或 qscc。
+    * 如果 chainID 不为空，获取对应 chain 的账本结构，检查 TxID 的唯一性（交易在账本上没发生过）；
+    * 对于用户 CC，检查 ACL。根据 chaincode 指定的 endorsement Policy，签名提案者在指定 channel 上有写权限，最终是调用 common/cauthdsl 下面代码，支持指定必须包括某个成员来签名，或者是凑够若干几个合法签名。
+* 模拟执行提案
+    * 如果 chainID 不为空，获取对应账本的交易模拟器（TxSimulator）和历史查询器（HistoryQueryExecutor），把 historyqueryexecutor 加入到 Context 的 K-V 储存中。
+    * 如果 chainID 不为空，调用 simulateProposal() 方法获取模拟执行的结果，检查返回的响应 response的状态，若不小于错误 500 则创建并返回一个失败的 ProposalResponse。
+* 对提案进行背书
+    * chainID 不为空下，调用 endorseProposal()方法对之前得到的模拟执行的结果进行背书，返回 ProposalResponse，检查 simulateProposal 返回的response 的状态，若不小于错误阈值 400（被背书节点反对），返回 ProposalResponse 及链码错误 chaincodeError（endorseProposal 里有检查链码执行结果的状态，而 simulateProposal 没有检查）。
+    * 将 response.Payload 赋给 ProposalResponse.Response.Payload（因为 simulateProposal 返回的 response 里面包含链码调用的结果）。
+    * 返回响应消息 ProposalResponse。
 
 #### simulateProposal 方法
 
