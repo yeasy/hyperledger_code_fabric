@@ -30,7 +30,7 @@ type Endorser struct {
     * 如果 chainID 不为空，获取对应账本的交易模拟器（TxSimulator）和历史查询器（HistoryQueryExecutor），把 historyqueryexecutor 加入到 Context 的 K-V 储存中。
     * 如果 chainID 不为空，调用 simulateProposal() 方法获取模拟执行的结果，检查返回的响应 response的状态，若不小于错误 500 则创建并返回一个失败的 ProposalResponse。
 * 对提案进行背书
-    * chainID 不为空下，调用 endorseProposal()方法对之前得到的模拟执行的结果进行背书，返回 ProposalResponse，检查 simulateProposal 返回的response 的状态，若不小于错误阈值 400（被背书节点反对），返回 ProposalResponse 及链码错误 chaincodeError（endorseProposal 里有检查链码执行结果的状态，而 simulateProposal 没有检查）。
+    * chainID 非空情况下，调用 endorseProposal() 方法利用 ESCC，对之前得到的模拟执行的结果进行背书。返回 ProposalResponse，检查 simulateProposal 返回的response 的状态，若不小于错误阈值 400（被背书节点反对），返回 ProposalResponse 及链码错误 chaincodeError（endorseProposal 里有检查链码执行结果的状态，而 simulateProposal 没有检查）。
     * 将 response.Payload 赋给 ProposalResponse.Response.Payload（因为 simulateProposal 返回的 response 里面包含链码调用的结果）。
     * 返回响应消息 ProposalResponse。
 
@@ -38,10 +38,13 @@ type Endorser struct {
 
 主要过程如下：
 
-* 获取ChaincodeInvocationSpec，里面包含了链码调用时传入的各种参数。
-* 检查 ESCC 和 VSCC（TODO）
-* 不是系统链码的话，检查是否实例化，并检验本地文件系统得到的实例化 Policy 是否跟 LSCC 得到的实例化 Policy 匹配。
-* 执行 Proposal，调用 callChaincode() 方法，返回 response 和 ccevent。
+* 从提案结构中提取 ChaincodeInvocationSpec，里面包含了所调用链码的路径、名称和版本，以及调用时传入的各种参数；
+* 检查 ESCC 和 VSCC（这里其实不需要）；
+* 对用户链码，检查提案中的实例化 Policy 是否跟 LSCC 得到的实例化 Policy 匹配。防止有人超出权限在其它通道实例化。
+* 调用 callChaincode() 方法执行 Proposal，返回 response 和 ccevent。
+    * 调用 ExecuteChaincode() 方法，该方法主要调用 Execute() 方法。调用过程中会把交易模拟器和历史查询器通过上下文结构体传入后续子方法。
+    * Execute() 方法调用 theChaincodeSupport.Launch() 方法启动链码容器。Launch() 方法会创建 CC 容器并启动。
+    * Execute() 方法进一步调用 theChaincodeSupport.Execute() 方法发送消息给 CC 容器，执行相关的合约。
 * 对  transactionSimulator 执行 GetTxSimulationResults()拿到交易读写集 simResult。
 * 返回链码数据 ChaincodeData（LSCC 中的）、响应 response、交易读写集 simResult、链码事件信息 ccevent。
 
