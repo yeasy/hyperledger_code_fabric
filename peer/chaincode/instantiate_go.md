@@ -22,3 +22,7 @@ instantiate 支持包括 policy、channel、escc、vscc 在内更多的命令行
 * 调用 EndorserClient，发送 gprc 消息，将签名后 Proposal 发给指定的 peer。
 * 根据 peer 的返回，创建一个 Envelop 结构并进行签名。
 * 将 Envelop 通过 grpc 通道发给 orderer。
+
+整体流程如下图所示。
+
+![peer chaincode instantiate 过程](../_images/peer_chaincode_instantiate.png)
