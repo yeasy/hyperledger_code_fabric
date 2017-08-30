@@ -20,7 +20,10 @@ type Endorser struct {
 
 #### ProcessProposal() 方法主要过程
 
-主要过程如下：
+主要过程如下图所示。
+
+![Endorser ProcessProposal 过程](../_images/core_endorser_Endorser_ProcessProposal.png)
+
 * 检查提案合法性；
     * 调用 ValidateProposalMessage() 方法对签名的提案进行格式检查，主要检查 Channel头（是否合法头部类型）、签名头（是否包括了 nonce和creators 数据），检查签名域（creator 是合法证书，签名是否正确）。
     * 如果是系统 CC（SCC），检查是否是允许从外部调用的三种 SCC 之一：cscc、lscc 或 qscc。
@@ -33,6 +36,7 @@ type Endorser struct {
     * chainID 非空情况下，调用 endorseProposal() 方法利用 ESCC，对之前得到的模拟执行的结果进行背书。返回 ProposalResponse，检查 simulateProposal 返回的response 的状态，若不小于错误阈值 400（被背书节点反对），返回 ProposalResponse 及链码错误 chaincodeError（endorseProposal 里有检查链码执行结果的状态，而 simulateProposal 没有检查）。
     * 将 response.Payload 赋给 ProposalResponse.Response.Payload（因为 simulateProposal 返回的 response 里面包含链码调用的结果）。
     * 返回响应消息 ProposalResponse。
+
 
 #### simulateProposal 方法
 
