@@ -19,6 +19,8 @@ peer chaincode install -n test_cc -p github.com/hyperledger/fabric/examples/chai
 * install 方法基于传入的 CDS，生成一个 install 类型的 Proposal，进行签名和转化为一个 protobuf 提案消息；
 * 通过 EndorserClient 经由 grpc 通道发送给 peer 进行背书。
 
+整体流程如下图所示。
+
 ![peer chaincode install 过程](../_images/peer_chaincode_install.png)
 
 
