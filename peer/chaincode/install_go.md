@@ -22,7 +22,6 @@ peer chaincode install -n test_cc -p github.com/hyperledger/fabric/examples/chai
 ![peer chaincode install 过程](../_images/peer_chaincode_install.png)
 
 
-
 #### 生成 ChaincodeDeploymentSpec 结构
 
 ![ChaincodeDeploymentSpec 结构](../_images/proto-peer-chaincode.png)
