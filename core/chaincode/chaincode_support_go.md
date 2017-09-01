@@ -1,6 +1,6 @@
 ### chaincode_support.go
 
-ChaincodeSupport 结构是 peer 侧对链码支持的主要数据结构。peer 启动后，会初始化一个该结构体。
+主要实现 ChaincodeSupport 结构，这是 peer 侧对链码支持的主要数据结构。peer 启动后，会初始化一个该结构体。
 
 ```go
 type ChaincodeSupport struct {
