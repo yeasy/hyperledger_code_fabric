@@ -76,5 +76,5 @@ $ git rebase upstream/master
 $ git push -f origin master
 ```
 
-_本书结构由 _[_gitbook\_gen_](https://github.com/yeasy/code_snippet/blob/master/python/gitbook_gen.py)_ 维护_。
+*本书结构由 [gitbook_gen](https://github.com/yeasy/code_snippet/blob/master/python/gitbook_gen.py) 维护*。
 
