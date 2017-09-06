@@ -1,6 +1,8 @@
 # Summary
 
 * [前言](README.md)
+* [修订记录](revision.md)
+* [如何贡献](contribute.md)
 * [整体结构](overview.md)
 * [核心过程](process/README.md)
     * [Chaincode 容器启动](process/chaincode_start.md)
