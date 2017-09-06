@@ -2,6 +2,10 @@
 
 * [前言](README.md)
 * [整体结构](overview.md)
+* [核心过程](process/README.md)
+    * [Chaincode 容器启动](process/chaincode_start.md)
+    * [Peer 节点启动](process/peer_start.md)
+    * [Orderer 节点启动](process/orderer_start.md)
 * [bccsp](bccsp/README.md)
     * [factory](bccsp/factory/README.md)
         * [factory.go](bccsp/factory/factory_go.md)
