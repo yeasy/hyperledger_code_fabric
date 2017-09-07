@@ -12,7 +12,7 @@
 * pdf 版本 [下载](https://www.gitbook.com/download/pdf/book/yeasy/hyperledger_code_fabric)
 * epub 版本 [下载](https://www.gitbook.com/download/epub/book/yeasy/hyperledger_code_fabric)
 
-区块链技术自身仍在快速发展中，生态环境也在蓬勃成长。欢迎 [参与维护项目](contribute.md)。
+Hyperledger Fabric 自身仍在快速发展中，生态环境也在蓬勃成长。欢迎 [参与维护项目](contribute.md)。
 
 * [修订记录](revision.md)
 * [贡献者名单](https://github.com/yeasy/hyperledger_code_fabric/graphs/contributors)
