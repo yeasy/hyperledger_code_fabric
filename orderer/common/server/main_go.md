@@ -91,15 +91,30 @@ logger.Fatal("Failed to return new GRPC server:", err)
 }
 ```
 
-### initializeMultiChainManager
+### initializeMultichannelRegistrar
 
-初始化一个 multichain.Manager 结构。十分核心的代码。
+这一部分是十分核心的初始化步骤。
+
+初始化一个 multichannel.Registrar 结构，是整个服务的访问和控制核心结构。
 
 通过 createLedgerFactory() 初始化账本结构，包括 file、json、ram 等类型。file 的话会在本地指定目录（/var/production/chains）下创建账本结构。账本所关联的链名称会自动命名为 chain_FILENAME。之后通过指定初始区块，或自动生成来初始化区块链结构。至此，账本结构初始化完成。
 
 接下来，初始化 consenter 部分，初始化 solo、kafka 两种类型。
 
-账本、consenter，再加上传入的签名者结构，通过 NewManagerImpl() 方法构造一个 multichain.Manager 结构，负责处理消息。并且会挨个检查区块链结构，调用 start 方法启动。
+账本、consenter，再加上传入的签名者结构，通过 multichannel.NewRegistrar() 方法构造一个 multichannel.Registrar 结构，负责处理消息。并且会挨个检查区块链结构，调用 start 方法启动。
+
+
+```go
+type Registrar struct {
+	chains          map[string]*ChainSupport
+	consenters      map[string]consensus.Consenter
+	ledgerFactory   ledger.Factory
+	signer          crypto.LocalSigner
+	systemChannelID string
+	systemChannel   *ChainSupport
+	templator       msgprocessor.ChannelConfigTemplator
+}
+```
 
 ### NewServer
 
@@ -112,7 +127,7 @@ type server struct {
 }
 ```
 
-NewServer 分别初始化这两个句柄，挂载上前面初始化的 multichain.Manager 结构。broadcast 句柄还需要初始化一个配置更新的处理器，负责处理 CONFIG_UPDATE 交易。
+NewServer 分别初始化这两个句柄，挂载上前面初始化的 multichannel.Registrar 结构。broadcast 句柄还需要初始化一个配置更新的处理器，负责处理 CONFIG_UPDATE 交易。
 
 ```go
 func NewServer(ml multichain.Manager, signer crypto.LocalSigner) ab.AtomicBroadcastServer {
