@@ -45,8 +45,7 @@ Chaincode 首先是一个普通的 Golang 程序，其 main 方法中调用了 s
 
 ![Chaincode 启动过程](_images/chaincode_Start.png)
 
-
-首先会进行初始化。包括读取默认配置，创建到 Peer 的gRPC 连接，主要包括 NewChaincodeSupportClient(cc *grpc.ClientConn) 和 chaincodeSupportClient.Register(ctx context.Context, opts ...grpc.CallOption) 两个方法。
+首先会进行初始化。包括读取默认配置，创建到 Peer 的gRPC 连接，主要包括 `NewChaincodeSupportClient(cc *grpc.ClientConn)` 和 `chaincodeSupportClient.Register(ctx context.Context, opts ...grpc.CallOption)` 两个方法。
 
 初始化完成后，创建有限状态机结构（FSM，github.com/looplab/fsm）。FSM 会根据收到的消息和当前状态来触发状态转移，并执行提前设置的操作。
 

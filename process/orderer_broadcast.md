@@ -1,6 +1,8 @@
-#### broadcast.go
+## Orderer 节点 Broadcast 处理
 
-对 orderer 服务的 Broadcast 请求，会交给 `orderer.common.server` 包中 server 结构体的 `Broadcast(srv ab.AtomicBroadcast_BroadcastServer) error` 方法处理。该方法主要会调用到 `orderer.common.broadcast` 包中的 handlerImpl 结构的 `func (bh *handlerImpl) Handle(srv ab.AtomicBroadcast_BroadcastServer) error` 方法。
+Broadcast 过程意味着客户端将请求（例如完成背书的交易消息）通过 gRPC 接口发送给 Ordering 服务。
+
+这些请求，会交给 `orderer.common.server` 包中 server 结构体的 `Broadcast(srv ab.AtomicBroadcast_BroadcastServer) error` 方法处理。该方法主要会调用到 `orderer.common.broadcast` 包中 handlerImpl 结构的 `func (bh *handlerImpl) Handle(srv ab.AtomicBroadcast_BroadcastServer) error` 方法进行处理。
 
 handlerImpl 结构体十分重要，完成对 Broadcast 请求的核心处理过程。
 
@@ -14,7 +16,11 @@ func (bh *handlerImpl) Handle(srv ab.AtomicBroadcast_BroadcastServer) error
 
 `Handle(srv ab.AtomicBroadcast_BroadcastServer) error` 方法会开启一个循环来从 srv 中读取请求消息并进行处理，直到结束。
 
-##### 解析消息
+整体的处理过程如下图所示。
+
+![Orderer 节点 Broadcast 请求过程](_images/orderer_common_broadcast.png)
+
+### 解析消息
 
 首先，解析消息，获取消息头、是否为配置消息、获取对应处理器结构。
 
@@ -52,7 +58,7 @@ channel 头部从消息信封结构中解析出来；是否为配置信息根据
 
 之后，利用解析后的结果，分别对不同类型的消息（普通消息、配置消息）进行不同处理。下面以应用通道的 ChainSupport 结构作为处理器进行介绍。
 
-##### 处理非配置消息
+### 处理非配置消息
 
 对于非配置消息，主要执行如下两个操作：消息检查和入队列操作。
 
@@ -93,7 +99,7 @@ func (chain *chainImpl) Order(env *cb.Envelope, configSeq uint64) error {
 }
 ```
 
-##### 处理配置消息
+### 处理配置消息
 
 对于配置消息，处理过程与正常消息略有不同，包括合并配置更新消息和入队列操作。
 
@@ -150,7 +156,7 @@ func (chain *chainImpl) Configure(config *cb.Envelope, configSeq uint64) error {
 }
 ```
 
-##### 返回响应
+### 返回响应
 
 如果处理成功，则返回成功响应消息。
 

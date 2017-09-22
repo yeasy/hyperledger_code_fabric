@@ -97,12 +97,6 @@ logger.Fatal("Failed to return new GRPC server:", err)
 
 初始化一个 multichannel.Registrar 结构，是整个服务的访问和控制核心结构。
 
-通过 createLedgerFactory() 初始化账本结构，包括 file、json、ram 等类型。file 的话会在本地指定目录（/var/production/chains）下创建账本结构。账本所关联的链名称会自动命名为 chain_FILENAME。之后通过指定初始区块，或自动生成来初始化区块链结构。至此，账本结构初始化完成。
-
-接下来，初始化 consenter 部分，初始化 solo、kafka 两种类型。
-
-账本、consenter，再加上传入的签名者结构，通过 multichannel.NewRegistrar() 方法构造一个 multichannel.Registrar 结构，负责处理消息。并且会挨个检查区块链结构，调用 start 方法启动。
-
 
 ```go
 type Registrar struct {
@@ -115,6 +109,21 @@ type Registrar struct {
 	templator       msgprocessor.ChannelConfigTemplator
 }
 ```
+
+通过 createLedgerFactory() 初始化账本结构，包括 file、json、ram 等类型。file 的话会在本地指定目录（/var/production/chains）下创建账本结构。账本所关联的链名称会自动命名为 chain_FILENAME。之后通过指定初始区块，或自动生成来初始化区块链结构。至此，账本结构初始化完成。
+
+接下来，初始化 consenter 部分，初始化 solo、kafka 两种类型。
+
+账本、consenter，再加上传入的签名者结构，通过 multichannel.NewRegistrar() 方法构造一个 multichannel.Registrar 结构，负责处理消息。
+
+multichannel.NewRegistrar() 方法会查看本地已有的链结构文件（例如重启后），并挨个执行如下过程：
+
+* 创建账本工厂对象；
+* 获取配置区块，根据配置区块创建账本资源对象；
+* 如果配置中包括联盟信息，说明该链结构是系统链，调用。
+* 如果配置中不包括联盟信息，说明该链结构是应用链，同样调用 newChainSupport() 方法生成链支持结构，并通过链的 start() 方法启动。
+
+
 
 ### NewServer
 

@@ -8,6 +8,8 @@
     * [链码容器启动](process/chaincode_start.md)
     * [Peer 节点启动](process/peer_start.md)
     * [Orderer 节点启动](process/orderer_start.md)
+    * [Orderer 节点 Broadcast 处理](process/orderer_broadcast.md)
+    * [Orderer 节点 Deliver 处理](process/orderer_deliver.md)
     * [创建通道](process/channel_create.md)
     * [加入通道](process/channel_join.md)
     * [更新锚节点配置](process/anchor_update.md)
