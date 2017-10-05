@@ -35,5 +35,40 @@ func Main() {
 
 ![orderer.common.server 包中的 Main() 方法](_images/orderer_common_server_Start.png)
 
+Start() 方法会初始化 gRPC 服务需要的结构，然后启动服务。
 
+核心代码如下所示。
 
+```go
+func Start(cmd string, conf *config.TopLevel) {
+	logger.Debugf("Start()")
+	signer := localmsp.NewSigner()
+	manager := initializeMultichannelRegistrar(conf, signer)
+	server := NewServer(manager, signer, &conf.Debug)
+
+	switch cmd {
+	case start.FullCommand(): // "start" command
+		logger.Infof("Starting %s", metadata.GetVersionInfo())
+		initializeProfilingService(conf)
+		grpcServer := initializeGrpcServer(conf)
+		ab.RegisterAtomicBroadcastServer(grpcServer.Server(), server)
+		logger.Info("Beginning to serve requests")
+		grpcServer.Start()
+	case benchmark.FullCommand(): // "benchmark" command
+		logger.Info("Starting orderer in benchmark mode")
+		benchmarkServer := performance.GetBenchmarkServer()
+		benchmarkServer.RegisterService(server)
+		benchmarkServer.Start()
+	}
+}
+```
+
+### gRPC 服务结构初始化
+
+包括创建新的 MSP 签名结构，初始化最核心的 Registrar 结构来管理各个账本结构，以及创建 gRPC 服务端结构。
+
+```go
+signer := localmsp.NewSigner()
+manager := initializeMultichannelRegistrar(conf, signer)
+server := NewServer(manager, signer, &conf.Debug)
+```
