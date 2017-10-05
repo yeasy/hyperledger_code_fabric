@@ -118,7 +118,14 @@ for _, chainID := range existingChains {
 	if _, ok := ledgerResources.ConsortiumsConfig(); ok { // 如果是系统账本
 	chain := newChainSupport(r, ledgerResources, consenters, signer)
 	chain.Processor = msgprocessor.NewSystemChannel(chain, r.templator, msgprocessor.CreateSystemChannelFilters(r, chain))
+	r.chains[chainID] = chain
+	r.systemChannelID = chainID
+	r.systemChannel = chain
+	defer chain.start()
 	else // 如果是应用账本
+	chain := newChainSupport(r, ledgerResources, consenters, signer)
+	r.chains[chainID] = chain
+	chain.start()
 	}
 ```
 
