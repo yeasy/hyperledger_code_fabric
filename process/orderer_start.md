@@ -65,13 +65,15 @@ func Start(cmd string, conf *config.TopLevel) {
 
 ### gRPC 服务结构初始化
 
-包括创建新的 MSP 签名结构，初始化最核心的 Registrar 结构来管理各个账本结构，以及创建 gRPC 服务端结构。
+包括创建新的 MSP 签名结构，初始化 Registrar 结构来管理各个账本结构，以及创建 gRPC 服务端结构。
 
 ```go
 signer := localmsp.NewSigner() // 初始化签名结构
 manager := initializeMultichannelRegistrar(conf, signer) // 初始化账本管理器结构
 server := NewServer(manager, signer, &conf.Debug) // 创建 gRPC 服务端
 ```
+
+*说明：Registrar 结构（位于 `orderer.common.multichannel` 包）是 Orderer 组件中最核心的结构，管理了 Orderer 中所有的账本、共识插件等数据结构。*
 
 `initializeMultichannelRegistrar(conf, signer)` 方法十分关键，核心代码如下：
 
@@ -102,8 +104,23 @@ func initializeMultichannelRegistrar(conf *config.TopLevel, signer crypto.LocalS
 * 创建账本操作的工厂结构；
 * （可选）如果是新启动情况，利用给定的系统初始区块文件初始化系统通道相关结构；
 * 完成共识插件（包括 `solo` 和 `kafka` 两种）的初始化；
-* 启动每个账本的维护者结构。
+* `NewRegistrar(lf, consenters, signer)`
+方法会扫描本地账本数据（至少已存在系统通道），创建 Registrar 结构，为每个账本都启动维护者结构。
 
+
+#### 创建 Registrar 结构
+
+`NewRegistrar(lf, consenters, signer)` 方法位于 `orderer.common.multichannel` 包，核心代码如下：
+
+```go
+existingChains := ledgerFactory.ChainIDs()
+for _, chainID := range existingChains {
+	if _, ok := ledgerResources.ConsortiumsConfig(); ok { // 如果是系统账本
+	chain := newChainSupport(r, ledgerResources, consenters, signer)
+	chain.Processor = msgprocessor.NewSystemChannel(chain, r.templator, msgprocessor.CreateSystemChannelFilters(r, chain))
+	else // 如果是应用账本
+	}
+```
 
 ### gRPC 服务启动
 
