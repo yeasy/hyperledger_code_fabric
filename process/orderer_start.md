@@ -121,13 +121,15 @@ for _, chainID := range existingChains {
 		r.chains[chainID] = chain
 		r.systemChannelID = chainID
 		r.systemChannel = chain
-		defer chain.start()
+		defer chain.start() // 启动共识过程
 	else // 如果是应用账本
 		chain := newChainSupport(r, ledgerResources, consenters, signer)
 		r.chains[chainID] = chain
-		chain.start()
+		chain.start()  // 启动共识过程
 	}
 ```
+
+以 Kafka 共识插件为例，其中，`chain.start()` 方法最终调用到 `orderer.consensus.kafka` 包中的 startThread() 方法。
 
 ### gRPC 服务启动
 
