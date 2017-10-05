@@ -68,7 +68,43 @@ func Start(cmd string, conf *config.TopLevel) {
 包括创建新的 MSP 签名结构，初始化最核心的 Registrar 结构来管理各个账本结构，以及创建 gRPC 服务端结构。
 
 ```go
-signer := localmsp.NewSigner()
-manager := initializeMultichannelRegistrar(conf, signer)
-server := NewServer(manager, signer, &conf.Debug)
+signer := localmsp.NewSigner() // 初始化签名结构
+manager := initializeMultichannelRegistrar(conf, signer) // 初始化账本管理器结构
+server := NewServer(manager, signer, &conf.Debug) // 创建 gRPC 服务端
 ```
+
+`initializeMultichannelRegistrar(conf, signer)` 方法十分关键，核心代码如下：
+
+```go
+func initializeMultichannelRegistrar(conf *config.TopLevel, signer crypto.LocalSigner) *multichannel.Registrar {
+	// 创建账本操作的工厂结构
+	lf, _ := createLedgerFactory(conf)
+	
+	// 如果是新启动情况，创建系统通道的账本结构
+	if len(lf.ChainIDs()) == 0 {
+		logger.Debugf("There is no chain, hence we must be in bootstrapping")
+		initializeBootstrapChannel(conf, lf)
+	} else {
+		logger.Info("Not bootstrapping because of existing chains")
+	}
+	//初始化共识插件
+	consenters := make(map[string]consensus.Consenter)
+	consenters["solo"] = solo.New()
+	consenters["kafka"] = kafka.New(conf.Kafka.TLS, conf.Kafka.Retry, conf.Kafka.Version, conf.Kafka.Verbose)
+
+	// 启动各个链结构上的维护者（chainSupport）结构
+	return multichannel.NewRegistrar(lf, consenters, signer)
+}
+```
+
+利用传入的配置信息和签名信息完成如下步骤：
+
+* 创建账本操作的工厂结构；
+* （可选）如果是新启动情况，利用给定的系统初始区块文件初始化系统通道相关结构；
+* 完成共识插件（包括 `solo` 和 `kafka` 两种）的初始化；
+* 启动每个账本的维护者结构。
+
+
+### gRPC 服务启动
+
+
