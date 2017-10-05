@@ -4,7 +4,6 @@ orderer 启动后的 main 方法会调用到这里的 `Main()` 方法。
 
 核心代码非常简单。
 
-
 ```go
 // Main is the entry point of orderer process
 func Main() {
@@ -29,7 +28,11 @@ func Main() {
 ![orderer.common.server 包中的 Main() 方法](../../_images/orderer_common_server_Start.png)
 
 
-其中，initializeLocalMsp() 和 Start()做了大部分的工作。
+其中：
+* config.Load()：从本地配置文件和环境变量中读取配置信息，构建配置树结构。
+* initializeLoggingLevel(conf)：配置日志级别。
+* initializeLocalMsp(conf)：配置 MSP 结构。
+* Start()：完成启动后的核心工作。
 
 ##### initializeLocalMsp
 
@@ -47,7 +50,7 @@ func initializeLocalMsp(conf *config.TopLevel) {
 
 ##### Start()
 
-Start() 完成了主要的操作。
+Start() 完成了 Orderer 节点主要的启动过程。
 
 首先，利用 localmsp，创建签名者结构。
 
