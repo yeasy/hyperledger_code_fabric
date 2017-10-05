@@ -29,7 +29,7 @@ func Main() {
 * initializeLocalMsp(conf)：配置 MSP 结构。
 * Start()：完成启动后的核心工作。
 
-### 整体
+### 整体过程
 
 核心启动过程都在 `orderer/common/server`包中的 Start() 方法，如下图所示。
 
