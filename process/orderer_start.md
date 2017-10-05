@@ -131,6 +131,25 @@ for _, chainID := range existingChains {
 
 以 Kafka 共识插件为例，其中，`chain.start()` 方法最终调用到 `orderer.consensus.kafka` 包中的 startThread() 方法。
 
+startThread() 方法将为指定的账本结构配置共识服务，并将其启动，核心代码包括：
+
+```go
+// 创建 Producer 结构
+chain.producer, err = setupProducerForChannel(chain.consenter.retryOptions(), chain.haltChan, chain.SharedConfig().KafkaBrokers(), chain.consenter.brokerConfig(), chain.channel)
+
+// 发送 CONNECT 消息
+sendConnectMessage(chain.consenter.retryOptions(), chain.haltChan, chain.producer, chain.channel)
+
+// 创建到对应 Kafka topic 中 
+chain.parentConsumer, err = setupParentConsumerForChannel(chain.consenter.retryOptions(), chain.haltChan, chain.SharedConfig().KafkaBrokers(), chain.consenter.brokerConfig(), chain.channel)
+chain.channelConsumer, err = setupChannelConsumerForChannel(chain.consenter.retryOptions(), chain.haltChan, chain.parentConsumer, chain.channel, chain.lastOffsetPersisted+1)
+```
+
+
+主要包括如下步骤：
+
+* 创建到 Kafka 集群的 Producer 结构并发送 CONNECT 消息。
+
 ### gRPC 服务启动
 
 
