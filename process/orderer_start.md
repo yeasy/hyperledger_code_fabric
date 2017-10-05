@@ -23,11 +23,13 @@ func Main() {
 }
 ```
 
-包括配置初始化过程和核心启动过程：
+包括配置初始化过程和核心启动过程两个部分：
 * config.Load()：从本地配置文件和环境变量中读取配置信息，构建配置树结构。
 * initializeLoggingLevel(conf)：配置日志级别。
 * initializeLocalMsp(conf)：配置 MSP 结构。
 * Start()：完成启动后的核心工作。
+
+### 整体
 
 核心启动过程都在 `orderer/common/server`包中的 Start() 方法，如下图所示。
 
