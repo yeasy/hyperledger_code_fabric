@@ -32,8 +32,6 @@ func Main() {
 
 核心启动过程如下图所示。
 
-
-
 ![orderer.common.server 包中的 Main() 方法](_images/orderer_common_server_Start.png)
 
 
