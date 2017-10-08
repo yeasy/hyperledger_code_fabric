@@ -16,7 +16,7 @@ func (ds *deliverServer) Handle(srv ab.AtomicBroadcast_DeliverServer) error
 
 ### 整体过程
 
-Deliver 请求的整体处理过程如下图所示。
+整体处理过程如下图所示。
 
 ![Orderer 节点 Deliver 处理过程](_images/orderer_common_deliver.png)
 
@@ -46,7 +46,7 @@ payload, err := utils.UnmarshalPayload(envelope.Payload)
 // 提取通道头
 chdr, err := utils.UnmarshalChannelHeader(payload.Header.ChannelHeader)
 
-// 获取链结构
+// 获取链结构，映射到 orderer.common.multichannel 包中 Registrar 结构体中对应方法
 chain, ok := ds.sm.GetChain(chdr.ChannelId)
 
 // 获取当前配置序列号
