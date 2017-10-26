@@ -1,4 +1,4 @@
-## Orderer 节点启动
+## Orderer 节点启动过程
 
 Orderer 节点启动通过 `orderer` 包下的 main() 方法实现，会进一步调用到 `orderer/common/server` 包中的 `Main()` 方法。
 
@@ -162,7 +162,21 @@ chain.processMessagesToBlocks()
 
 * 创建到 Kafka 集群的 Producer 结构并发送 CONNECT 消息；
 * 为对应的 topic 创建 Consumer 结构，并配置从指定分区读取消息的 PartitionConsumer 结构；
-* 启动链对应的 Kafka 分区中消息的循环处理过程。`processMessagesToBlocks()` 方法不断从分区中 Consume 消息并进行处理，同时定时发送 TimeToCut 消息。处理消息类型包括 Connect 消息（Producer 启动后发出）、TimeToCut 消息和 Regular 消息（普通的交易）。分别调用对应方法进行处理。
+* 启动链对应的 Kafka 分区中消息的循环处理过程。`processMessagesToBlocks()` 方法不断从分区中 Consume 消息并进行处理，同时定时发送 TimeToCut 消息。处理消息类型包括 Connect 消息（Producer 启动后发出）、TimeToCut 消息和 Regular 消息（Fabric 消息）。分别调用对应方法进行处理。
+
+对于 Regular 的 Fabric 消息（包括交易消息和配置消息），具体会调用 chainImpl 结构体的 `processRegular(regularMessage *ab.KafkaMessageRegular, receivedOffset int64) error` 方法进行处理。该方法的核心代码如下：
+
+```go
+func (chain *chainImpl) processRegular(regularMessage *ab.KafkaMessageRegular, receivedOffset int64) error {
+	switch regularMessage.Class {
+		case ab.KafkaMessageRegular_NORMAL: // 普通交易消息
+			chain.ProcessNormalMsg(env) //检查消息合法性
+			commitNormalMsg(env) // 处理交易消息，满足条件则切块，写入本地账本
+		case ab.KafkaMessageRegular_CONFIG: // 配置消息
+			chain.ProcessConfigMsg(env) //检查消息合法性
+			commitConfigMsg(env) // 切块，写入账本。如果是 ORDERER_TRANSACTION 消息，创建新的应用通道账本；如果是 CONFIG 消息，更新配置。
+}
+```
 
 ### gRPC 服务启动
 
