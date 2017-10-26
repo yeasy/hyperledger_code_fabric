@@ -1,0 +1,1 @@
+### getinfo.go
