@@ -41,13 +41,12 @@ simulateProposal 方法会通过执行链码逻辑来获取对状态的修改结
 
 * 从提案结构的载荷中提取 ChaincodeInvocationSpec 结构，其中包含了所调用链码（包括系统链码和用户链码）的路径、名称和版本，以及调用时传入的参数列表；
 * 检查 ESCC 和 VSCC（尚未实现）；
-* 对用户链码，检查提案中的实例化 Policy 是否跟 LSCC 得到的实例化 Policy 匹配。防止有人超出权限在其它通道实例化。
-* 调用 callChaincode() 方法执行 Proposal，返回 response 和 ccevent。
-    * 调用 ExecuteChaincode() 方法，该方法主要调用 Execute() 方法。调用过程中会把交易模拟器和历史查询器通过上下文结构体传入后续子方法。
-    * Execute() 方法调用 theChaincodeSupport.Launch() 方法启动链码容器。Launch() 方法会创建 CC 容器并启动。
-    * Execute() 方法进一步调用 theChaincodeSupport.Execute() 方法发送消息给 CC 容器，执行相关的合约。
-* 对  transactionSimulator 执行 GetTxSimulationResults()拿到交易读写集 simResult。
-* 返回链码数据 ChaincodeData（LSCC 中的）、响应 response、交易读写集 simResult、链码事件信息 ccevent。
+* 对用户链码，检查提案中的实例化策略跟账本上记录的该链码的实例化策略（安装链码时指定）是否一致。防止有人修改权限在其它通道非法实例化。
+* 调用 callChaincode() 方法执行 Proposal，返回 Response 和 ChaincodeEvent。
+    * 调用 `core.endorser` 包中 `SupportImpl.Execute()` 方法，该方法主要调用 `core.chaincode` 包中的 `ExecuteChaincode()` 方法，进一步调用包内的 `Execute()` 方法。调用过程中会把交易模拟器和历史查询器通过上下文结构体传入后续子方法。
+    * `Execute()` 方法会调用 `ChaincodeSupport.Launch()` 方法创建并启动链码容器。启动成功后创建链码 gRPC 消息，通过 `ChaincodeSupport.Execute()` 方法发送消息给 CC 容器，执行相关的合约，并返回执行响应（ChaincodeMessage 结构）。此过程中会将读写集记录到交易模拟器结构体中。
+* 对于非空 chainID（大部分跟账本相关的操作），执行 GetTxSimulationResults() 拿到执行结果 `TxSimulationResults` 结构，从中可以解析出读写集数据。
+* 最终返回链码标准数据结构 ChaincodeDefinition、响应消息 ChaincodeMessage、交易读写集 PubSimulationResults、链码事件 ChaincodeEvent。
 
 #### endorseProposal 方法
 
