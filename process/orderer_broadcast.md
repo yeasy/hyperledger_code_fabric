@@ -27,13 +27,14 @@ Broadcast 请求的整体处理过程如下图所示。
 ```go
 for {
 	msg, error := srv.Recv() // 从请求中提取一个 Envelope 消息
+
 	chdr, isConfig, processor, err := bh.sm.BroadcastChannelSupport(msg) // 解析消息：是否为配置消息，消息应由哪个链处理	
 
 	// 对应的链对消息进行处理
-	if !isConfig {
+	if !isConfig { // 普通消息
 		configSeq, err := processor.ProcessNormalMsg(msg) //消息检查
 		processor.Order(msg, configSeq) //入队列操作
-	} else {
+	} else { // 配置消息，目前只有 CONFIG_UPDATE 类型，如创建、更新通道，或获取配置区块
 		config, configSeq, err := processor.ProcessConfigUpdateMsg(msg) // 合并配置更新消息
 		processor.Configure(config, configSeq) //入队列操作
 	}
@@ -60,14 +61,14 @@ func (r *Registrar) BroadcastChannelSupport(msg *cb.Envelope) (*cb.ChannelHeader
 		return nil, false, nil, fmt.Errorf("could not determine channel ID: %s", err)
 	}
 
-	cs, ok := r.chains[chdr.ChannelId] //应用通道、系统通道
+	cs, ok := r.chains[chdr.ChannelId] // 应用通道、系统通道
 	if !ok {
-		cs = r.systemChannel
+		cs = r.systemChannel // 空，则默认为系统通道，如查询系统链码（QSCC）的操作
 	}
 
 	isConfig := false
-	switch cs.ClassifyMsg(chdr) {
-	case msgprocessor.ConfigUpdateMsg:
+	switch cs.ClassifyMsg(chdr) { // 只有 CONFIG_UPDATE 会返回 ConfigUpdateMsg
+	case msgprocessor.ConfigUpdateMsg: // CONFIG_UPDATE 消息，包括创建、更新通道，获取配置区块等
 		isConfig = true
 	default:
 	}
@@ -76,13 +77,13 @@ func (r *Registrar) BroadcastChannelSupport(msg *cb.Envelope) (*cb.ChannelHeader
 }
 ```
 
-channel 头部从消息信封结构中解析出来；是否为配置信息根据消息头中类型进行判断（是否为 cb.HeaderType_CONFIG_UPDATE）;通过字典查到对应的 ChainSupport 结构（应用通道、系统通道）作为处理器。
+channel 头部从消息信封结构中解析出来；是否为配置信息根据消息头中通道类型进行判断（是否为 cb.HeaderType_CONFIG_UPDATE）;通过字典查到对应的 ChainSupport 结构（应用通道、系统通道）作为处理器。
 
 之后，利用解析后的结果，分别对不同类型的消息（普通消息、配置消息）进行不同处理。下面以应用通道的 ChainSupport 结构作为处理器进行介绍。
 
 ### 处理非配置消息
 
-对于非配置消息，主要执行如下两个操作：消息检查和入队列操作。
+对于非配置消息，主要执行如下两个操作：消息格式检查和入队列操作。
 
 ```go
 configSeq, err := processor.ProcessNormalMsg(msg) //消息检查
@@ -123,14 +124,16 @@ func (chain *chainImpl) Order(env *cb.Envelope, configSeq uint64) error {
 
 ### 处理配置消息
 
-对于配置消息，处理过程与正常消息略有不同，包括合并配置更新消息和入队列操作。
+对于配置消息（CONFIG_UPDATE 类型消息，包括创建、更新通道，获取配置区块等），处理过程与正常消息略有不同，包括合并配置更新消息和入队列操作。
+
+#### 合并配置更新
 
 ```go
-config, configSeq, err := processor.ProcessConfigUpdateMsg(msg) // 合并配置更新消息
-processor.Configure(config, configSeq) //入队列操作
+config, configSeq, err := processor.ProcessConfigUpdateMsg(msg) // 合并配置更新，生成新的配置信封结构
+processor.Configure(config, configSeq) //入队列操作，将新的配置信封结构消息扔给后端队列（如 Kafka）
 ```
 
-合并配置更新消息方法会映射到 orderer.common.msgprocessor 包中 StandardChannel 结构体的 `ProcessConfigUpdateMsg(env *cb.Envelope) (configSeq uint64, err error)` 方法，计算合并后的配置和配置编号，实现如下。 
+以应用通道为例，合并配置更新消息方法会映射到 `orderer.common.msgprocessor` 包中 `StandardChannel` 结构体的 `ProcessConfigUpdateMsg(env *cb.Envelope) (configSeq uint64, err error)` 方法，计算合并后的配置和配置编号，实现如下。 
 
 ```go
 func (s *StandardChannel) ProcessConfigUpdateMsg(env *cb.Envelope) (config *cb.Envelope, configSeq uint64, err error) {
@@ -142,11 +145,14 @@ func (s *StandardChannel) ProcessConfigUpdateMsg(env *cb.Envelope) (config *cb.E
 		return nil, 0, err
 	}
 
+	// 最终调用 `common/configtx` 包下 `ValidatorImpl.ProposeConfigUpdate()` 方法。
+	// 根据配置交易生成配置信封结构：Config 为更新后配置字典；LastUpdate 为输入的配置交易
 	configEnvelope, err := s.support.ProposeConfigUpdate(env)
 	if err != nil {
 		return nil, 0, err
 	}
 
+	// 生成签名的配置信封结构，通道头类型为 HeaderType_CONFIG。排序后消息类型将由 CONFIG_UPDATE 变更为 CONFIG
 	config, err = utils.CreateSignedEnvelope(cb.HeaderType_CONFIG, s.support.ChainID(), s.support.Signer(), configEnvelope, msgVersion, epoch)
 	if err != nil {
 		return nil, 0, err
@@ -160,18 +166,26 @@ func (s *StandardChannel) ProcessConfigUpdateMsg(env *cb.Envelope) (config *cb.E
 	return config, seq, nil
 }
 ```
+#### 入队列操作
 
-入队列操作会根据 consensus 配置的不同映射到 orderer.consensus.solo 包或 orderer.consensus.kafka 包中的方法。
+入队列操作会根据 consensus 配置的不同映射到 `orderer.consensus.solo` 包或 `orderer.consensus.kafka` 包中的方法。
 
-以 kafka 情况为例，会映射到 chainImpl 结构体的对应方法。该方法会将消息进一步封装为 `sarama.ProducerMessage` 类型消息，通过 enqueue 方法发给 Kafka 后端。
+以 kafka 情况为例，会映射到 `chainImpl` 结构体的对应方法。该方法会将消息进一步封装为 `KafkaMessage_Regular` 类型消息，通过 enqueue 方法发给 Kafka 后端。
 
 ```go
+// Implements the consensus.Chain interface. Called by Broadcast().
 func (chain *chainImpl) Configure(config *cb.Envelope, configSeq uint64) error {
+	return chain.configure(config, configSeq, int64(0))
+}
+
+func (chain *chainImpl) configure(config *cb.Envelope, configSeq uint64, originalOffset int64) error {
 	marshaledConfig, err := utils.Marshal(config)
 	if err != nil {
-		return fmt.Errorf("cannot enqueue, unable to marshal config because = %s", err)
+		return fmt.Errorf("cannot enqueue, unable to marshal config because %s", err)
 	}
-	if !chain.enqueue(newConfigMessage(marshaledConfig, configSeq)) {
+
+	// 封装为 `KafkaMessage_Regular` 类型消息并发给 Kafka
+	if !chain.enqueue(newConfigMessage(marshaledConfig, configSeq, originalOffset)) {
 		return fmt.Errorf("cannot enqueue")
 	}
 	return nil

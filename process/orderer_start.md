@@ -74,21 +74,21 @@ func Start(cmd string, conf *config.TopLevel) {
 
 包括创建新的 MSP 签名结构，初始化 Registrar 结构来管理各个账本结构，启动共识过程，以及创建 gRPC 服务端结构。
 
-核心过程包括：
+核心步骤包括：
 
 ```go
 signer := localmsp.NewSigner() // 初始化签名结构
-manager := initializeMultichannelRegistrar(conf, signer) // 初始化账本管理器（Registrar）结构
+manager := initializeMultichannelRegistrar(conf, signer, tlsCallback) // 初始化账本管理器（Registrar）结构
 ```
 
 其中，`initializeMultichannelRegistrar(conf, signer)` 方法最为关键，核心代码如下：
 
 ```go
-func initializeMultichannelRegistrar(conf *config.TopLevel, signer crypto.LocalSigner) *multichannel.Registrar {
-	// 创建账本操作的工厂结构
+func initializeMultichannelRegistrar(conf *config.TopLevel, signer crypto.LocalSigner, callbacks ...func(bundle *channelconfig.Bundle)) *multichannel.Registrar {
+	// 创建操作账本的工厂结构
 	lf, _ := createLedgerFactory(conf)
 	
-	// 如果是新启动情况，创建系统通道的账本结构
+	// 如果是全新启动情况，默认先创建系统通道的账本结构
 	if len(lf.ChainIDs()) == 0 {
 		logger.Debugf("There is no chain, hence we must be in bootstrapping")
 		initializeBootstrapChannel(conf, lf)
@@ -101,7 +101,7 @@ func initializeMultichannelRegistrar(conf *config.TopLevel, signer crypto.LocalS
 	consenters["kafka"] = kafka.New(conf.Kafka.TLS, conf.Kafka.Retry, conf.Kafka.Version, conf.Kafka.Verbose)
 
 	// 创建各个账本的管理器（Registrar）结构，并启动共识过程
-	return multichannel.NewRegistrar(lf, consenters, signer)
+	return multichannel.NewRegistrar(lf, consenters, signer, callbacks...)
 }
 ```
 
@@ -124,8 +124,8 @@ func initializeMultichannelRegistrar(conf *config.TopLevel, signer crypto.LocalS
 
 ```go
 existingChains := ledgerFactory.ChainIDs()
-for _, chainID := range existingChains {
-	if _, ok := ledgerResources.ConsortiumsConfig(); ok { // 如果是系统账本
+for _, chainID := range existingChains { // 启动本地所有的账本结构的共识过程
+	if _, ok := ledgerResources.ConsortiumsConfig(); ok { // 如果是系统账本（默认在全新启动时会自动创建）
 		chain := newChainSupport(r, ledgerResources, consenters, signer)
 		chain.Processor = msgprocessor.NewSystemChannel(chain, r.templator, msgprocessor.CreateSystemChannelFilters(r, chain))
 		r.chains[chainID] = chain
@@ -139,14 +139,20 @@ for _, chainID := range existingChains {
 	}
 ```
 
-`chain.start()` 方法负责启动共识过程，以 Kafka 共识插件为例，最终调用到 `orderer.consensus.kafka` 包中的 `startThread()` 方法。
+`chain.start()` 方法负责启动共识过程。以 Kafka 共识插件为例，最终以协程方式调用到 `orderer.consensus.kafka` 包中的 `startThread()` 方法，将在后台持续运行。
+
+```go
+func (chain *chainImpl) Start() {
+	go startThread(chain)
+}
+```
 
 `startThread()` 方法将为指定的账本结构配置共识服务，并将其启动，核心代码包括：
 
 ```go
 // 创建 Producer 结构
 chain.producer, err = setupProducerForChannel(chain.consenter.retryOptions(), chain.haltChan, chain.SharedConfig().KafkaBrokers(), chain.consenter.brokerConfig(), chain.channel)
-// 发送 CONNECT 消息
+// 发送 CONNECT 消息给 Kafka，如果失败，则退出
 sendConnectMessage(chain.consenter.retryOptions(), chain.haltChan, chain.producer, chain.channel)
 
 // 创建处理对应 Kafka topic 的 Consumer 结构
@@ -154,7 +160,7 @@ chain.parentConsumer, err = setupParentConsumerForChannel(chain.consenter.retryO
 // 配置从指定 partition 读取消息的 PartitionConsumer 结构
 chain.channelConsumer, err = setupChannelConsumerForChannel(chain.consenter.retryOptions(), chain.haltChan, chain.parentConsumer, chain.channel, chain.lastOffsetPersisted+1)
 
-// 从该链对应的分区读取消息，并进行处理过程
+// 从该链对应的 Kafka 分区不断读取消息，并进行处理过程
 chain.processMessagesToBlocks() 
 ```
 
@@ -162,7 +168,32 @@ chain.processMessagesToBlocks()
 
 * 创建到 Kafka 集群的 Producer 结构并发送 CONNECT 消息；
 * 为对应的 topic 创建 Consumer 结构，并配置从指定分区读取消息的 PartitionConsumer 结构；
-* 启动链对应的 Kafka 分区中消息的循环处理过程。`processMessagesToBlocks()` 方法不断从分区中 Consume 消息并进行处理，同时定时发送 TimeToCut 消息。处理消息类型包括 Connect 消息（Producer 启动后发出）、TimeToCut 消息和 Regular 消息（Fabric 消息）。分别调用对应方法进行处理。
+* 启动链对应的 Kafka 分区中消息的循环处理过程。
+
+### Kafka 消息的循环处理过程
+
+`processMessagesToBlocks()` 方法不断从分区中 Consume 消息并进行处理，同时定时发送 TimeToCut 消息。处理消息类型包括 Connect 消息（Producer 启动后发出）、TimeToCut 消息和 Regular 消息（Fabric 消息）。分别调用对应方法进行处理，主要流程如下：
+
+```go
+for {
+	select {
+		case <-chain.haltChan: // 链故障了，退出
+		case kafkaErr := <-chain.channelConsumer.Errors(): //获取 Kakfa 消息发生错误
+			select {
+				case <-chain.errorChan: // 连接关闭，不进行任何操作
+				default: //其它错误，OutofRange，关闭 errorChan；否则进行超时重连
+			}
+			select {
+				case <-chain.errorChan: // 连接仍然关闭，尝试后台进行重连
+			}
+		case <-topicPartitionSubscriptionResumed: // 继续
+		case <-deliverSessionTimedOut: //访问超时，尝试后台进行重连
+		case in, ok := <-chain.channelConsumer.Messages(): // 成功读取到消息，进行处理
+		case <-chain.timer:
+	}
+}
+```
+
 
 对于 Regular 的 Fabric 消息（包括交易消息和配置消息），具体会调用 chainImpl 结构体的 `processRegular(regularMessage *ab.KafkaMessageRegular, receivedOffset int64) error` 方法进行处理。该方法的核心代码如下：
 
