@@ -1,0 +1,51 @@
+language: node_js  # gitbook depends on nodejs
+dist: trusty
+sudo: required
+
+# test on one node.js versions: 0.8
+node_js:
+  - 0.8
+  - "stable"
+
+cache:
+  directories:
+    - node_modules # NPM packages
+
+before_install:
+  - sudo apt-get -qq update
+    #calibre required for gitbook pdf
+  - sudo apt-get install -y calibre
+
+install:
+  #- . $HOME/.nvm/nvm.sh
+  #- nvm install stable
+  #- nvm use stable
+  #- npm install
+  - npm install -g gitbook-cli
+
+script:
+  #Move the ebook-convert wrapper script to hide the real binary meaning this gets run instead.
+  #This is to get round the issue of running gitbook pdf inside a headless server
+  - sudo mv ebook-convert /usr/local/bin/
+  - gitbook install
+    # it is too slow now, need fix by gitbook
+    #- gitbook build
+    #- gitbook pdf ./
+  - echo "Removing unwanted files"
+  - rm -v _book/.travis.yml
+  - rm -v _book/*.yml
+  - rm -v _book/*.md
+  - rm -v _book/*.sh
+  - popd
+
+# configure notifications (email, IRC, campfire etc)
+# please update this section to your needs!
+#notifications:
+#  irc: "irc.freenode.org#travis"
+
+branches:
+  only:
+    - master
+
+env:
+  global:
