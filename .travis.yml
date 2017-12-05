@@ -2,9 +2,8 @@ language: node_js  # gitbook depends on nodejs
 dist: trusty
 sudo: required
 
-# test on one node.js versions: 0.8
+# test on one node.js versions: stable
 node_js:
-  - 0.8
   - "stable"
 
 cache:
