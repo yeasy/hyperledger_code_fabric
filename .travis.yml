@@ -30,12 +30,7 @@ script:
     # it is too slow now, need fix by gitbook
     #- gitbook build
     #- gitbook pdf ./
-  - echo "Removing unwanted files"
-  - rm -v _book/.travis.yml
-  - rm -v _book/*.yml
-  - rm -v _book/*.md
-  - rm -v _book/*.sh
-  - popd
+  - echo "TODO: Removing unwanted files"
 
 # configure notifications (email, IRC, campfire etc)
 # please update this section to your needs!
