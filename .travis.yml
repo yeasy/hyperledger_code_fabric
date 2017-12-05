@@ -30,7 +30,7 @@ script:
     # it is too slow now, need fix by gitbook
     #- gitbook build
     #- gitbook pdf ./
-  - echo "TODO: Removing unwanted files"
+  - echo "Removing unwanted files"
 
 # configure notifications (email, IRC, campfire etc)
 # please update this section to your needs!
