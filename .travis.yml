@@ -26,7 +26,6 @@ install:
 script:
   #Move the ebook-convert wrapper script to hide the real binary meaning this gets run instead.
   #This is to get round the issue of running gitbook pdf inside a headless server
-  - sudo mv ebook-convert /usr/local/bin/
   - gitbook install
     # it is too slow now, need fix by gitbook
     #- gitbook build
