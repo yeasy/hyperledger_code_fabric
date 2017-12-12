@@ -24,13 +24,13 @@ Broadcast 请求的整体处理过程如下图所示。
 
 `Handle(srv ab.AtomicBroadcast_BroadcastServer) error` 方法会开启一个循环来从 srv 中读取请求消息并进行处理，直到结束。主要包括解析消息、处理消息（包括配置消息和非配置消息）和返回响应三个步骤。
 
-核心代码如下所示（位于 `orderer/common/broadcast/broadcast.go`）：
+核心代码如下所示（位于 `orderer/common/broadcast/broadcast.go#handlerImpl.Handle()`）：
 
 ```go
 for {
 	msg, error := srv.Recv() // 从请求中提取一个 Envelope 消息
 
-	// 解析消息：判断是否为配置消息；消息由通道头部中指定的通道 ID 决定哪个账本来处理，本地对应账本结构不存在时（如新建应用通道）则由系统通道来处理
+	// 解析消息：判断是否为配置消息；获取对应本地账本结构：由通道头部中指定的通道 ID 决定，本地对应账本结构不存在时（如新建应用通道）则由系统通道来处理
 	chdr, isConfig, processor, err := bh.sm.BroadcastChannelSupport(msg) 
 	// 检查是否被之前重新提交的消息阻塞
 	processor.WaitReady()
@@ -41,7 +41,7 @@ for {
 		processor.Order(msg, configSeq) //入队列操作
 	} else { // 配置消息，目前只有 CONFIG_UPDATE 类型，如创建、更新通道，或获取配置区块
 		config, configSeq, err := processor.ProcessConfigUpdateMsg(msg) // 合并配置更新消息
-		processor.Configure(config, configSeq) //入队列操作
+		processor.Configure(config, configSeq) //入队列操作：相关处理后发给 Kafka
 	}
 
 	srv.Send(&ab.BroadcastResponse{Status: cb.Status_SUCCESS}) // 返回响应消息
@@ -76,7 +76,7 @@ func (r *Registrar) BroadcastChannelSupport(msg *cb.Envelope) (*cb.ChannelHeader
 
 	cs, ok := r.chains[chdr.ChannelId] // 应用通道、系统通道
 	if !ok {
-		cs = r.systemChannel // 空，则默认为系统通道，如查询系统链码（QSCC）的操作
+		cs = r.systemChannel // 空，则默认为系统通道，如收到新建应用通道请求时，Orderer 本地并没有该应用通道结构
 	}
 
 	isConfig := false
@@ -130,13 +130,17 @@ func (s *StandardChannel) ProcessNormalMsg(env *cb.Envelope) (configSeq uint64, 
 以 kafka 情况为例，会映射到 chainImpl 结构体的对应方法。该方法会将消息进一步封装为 `sarama.ProducerMessage` 类型消息，通过 enqueue 方法发给 Kafka 后端。
 
 ```go
-// orderer/consensus/kafka/chain.go
+// orderer/consensus/kafka/chain.go#chainImpl.Order(）
 func (chain *chainImpl) Order(env *cb.Envelope, configSeq uint64) error {
+	return chain.order(env, configSeq, int64(0))
+}
+
+func (chain *chainImpl) order(env *cb.Envelope, configSeq uint64, originalOffset int64) error {
 	marshaledEnv, err := utils.Marshal(env)
 	if err != nil {
 		return fmt.Errorf("cannot enqueue, unable to marshal envelope because = %s", err)
 	}
-	if !chain.enqueue(newNormalMessage(marshaledEnv, configSeq)) {
+	if !chain.enqueue(newNormalMessage(marshaledEnv, configSeq, originalOffset)) {
 		return fmt.Errorf("cannot enqueue")
 	}
 	return nil
@@ -199,14 +203,21 @@ func (s *StandardChannel) ProcessConfigUpdateMsg(env *cb.Envelope) (config *cb.E
 // orderer/common/msgprocessor/systemchannel.go
 func (s *SystemChannel) ProcessConfigUpdateMsg(envConfigUpdate *cb.Envelope) (config *cb.Envelope, configSeq uint64, err error) {
 	channelID, err := utils.ChannelID(envConfigUpdate)
-	if channelID == s.support.ChainID() { // 更新配置交易的处理，与普通通道相同
+	if channelID == s.support.ChainID() { // 更新系统通道的配置交易，与普通通道相同处理
 		return s.StandardChannel.ProcessConfigUpdateMsg(envConfigUpdate)
 	}
 
-	// 处理新建应用通道请求，封装为 ORDERER_TRANSACTION 类型消息
+	// 从系统通道中获取当前最新的配置
+	// orderer/common/msgprocessor/systemchannel.go#DefaultTemplator.NewChannelConfig()
 	bundle, err := s.templator.NewChannelConfig(envConfigUpdate)
+
+	// 合并来自客户端的配置更新信封结构，创建配置信封结构 ConfigEnvelope
 	newChannelConfigEnv, err := bundle.ConfigtxValidator().ProposeConfigUpdate(envConfigUpdate)
+
+	// 封装新的签名信封结构，其 Payload.Data 是 newChannelConfigEnv
 	newChannelEnvConfig, err := utils.CreateSignedEnvelope(cb.HeaderType_CONFIG, channelID, s.support.Signer(), newChannelConfigEnv, msgVersion, epoch)
+
+	// 处理新建应用通道请求，封装为 ORDERER_TRANSACTION 类型消息
 	wrappedOrdererTransaction, err := utils.CreateSignedEnvelope(cb.HeaderType_ORDERER_TRANSACTION, s.support.ChainID(), s.support.Signer(), newChannelEnvConfig, msgVersion, epoch)
 
 	s.StandardChannel.filters.Apply(wrappedOrdererTransaction) // 再次校验配置

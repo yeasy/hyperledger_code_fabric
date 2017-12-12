@@ -113,16 +113,14 @@ Kafka 相关的元数据（KafkaMetadata）包括：
 
 #### 配置交易消息
 
-首先会检查消息中配置版本号是否跟当前一致，如果不一致，则会更新后生成新的配置信封消息，扔回到后端的共识模块（如 Kafka），并且阻塞新的 Broadcast 消息直到重新提交的消息得到处理。代码片段如下：
+首先会检查消息中配置版本号是否跟当前链上的配置版本号一致。
+
+如果不一致，则会更新后生成新的配置信封消息，扔回到后端的共识模块（如 Kafka），并且阻塞新的 Broadcast 消息直到重新提交的消息得到处理。代码片段如下：
 
 ```go
 // orderer/consensus/kafka/chain.go
-if regularMessage.ConfigSeq < seq {
-	logger.Debugf("[channel: %s] Config sequence has advanced since this config message got validated, re-validating", chain.ChainID())
+if regularMessage.ConfigSeq < seq { // 消息中配置版本并非最新版本
 	configEnv, configSeq, err := chain.ProcessConfigMsg(env)
-	if err != nil {
-		return fmt.Errorf("rejecting config message because = %s", err)
-	}
 
 	// For both messages that are ordered for the first time or re-ordered, we set original offset
 	// to current received offset and re-order it.
@@ -130,7 +128,6 @@ if regularMessage.ConfigSeq < seq {
 		return fmt.Errorf("error re-submitting config message because = %s", err)
 	}
 
-	logger.Debugf("[channel: %s] Resubmitted config message with offset %d, block ingress messages", chain.ChainID(), receivedOffset)
 	chain.lastResubmittedConfigOffset = receivedOffset      // Keep track of last resubmitted message offset
 	chain.doneReprocessingMsgInFlight = make(chan struct{}) // Create the channel to block ingress messages
 
@@ -138,7 +135,38 @@ if regularMessage.ConfigSeq < seq {
 }
 ```
 
-接下来会检查是否满足生成区块的条件，满足则产生区块并写入本地账本结构。通过内部的 `commitConfigMsg(env)` 方法来完成。
+如果版本一致，则调用内部的 `commitConfigMsg(env)` 方法根据信封结构来产生区块。
+
+```go
+commitConfigMsg := func(message *cb.Envelope, newOffset int64) {
+    logger.Debugf("[channel: %s] Received config message", chain.ChainID())
+    batch := chain.BlockCutter().Cut()
+
+    if batch != nil { // 如果已经积累了一些交易，则先把它们打包为区块
+        logger.Debugf("[channel: %s] Cut pending messages into block", chain.ChainID())
+        block := chain.CreateNextBlock(batch)
+        metadata := utils.MarshalOrPanic(&ab.KafkaMetadata{
+            LastOffsetPersisted:         receivedOffset - 1,
+            LastOriginalOffsetProcessed: chain.lastOriginalOffsetProcessed,
+            LastResubmittedConfigOffset: chain.lastResubmittedConfigOffset,
+        })
+        chain.WriteBlock(block, metadata)
+        chain.lastCutBlockNumber++
+    }
+
+    chain.lastOriginalOffsetProcessed = newOffset
+    block := chain.CreateNextBlock([]*cb.Envelope{message}) // 将配置交易生成区块
+    metadata := utils.MarshalOrPanic(&ab.KafkaMetadata{
+        LastOffsetPersisted:         receivedOffset,
+        LastOriginalOffsetProcessed: chain.lastOriginalOffsetProcessed,
+        LastResubmittedConfigOffset: chain.lastResubmittedConfigOffset,
+    })
+    chain.WriteConfigBlock(block, metadata) // 添加区块到系统链
+    chain.lastCutBlockNumber++
+    chain.timer = nil
+}
+
+```
 
 由于每个配置消息会单独生成区块。因此，如果之前已经收到了一些普通交易消息，会先把这些消息生成区块。
 
