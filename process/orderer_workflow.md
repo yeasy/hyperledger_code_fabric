@@ -25,10 +25,12 @@ Fabric 网络提供了多通道特性，为了支持这一特性，同时保障�
 
 * 客户端通过 gRPC 连接发送交易信息到 Orderer 节点的 `Broadcast()` 接口。
 * Orderer 节点收到请求后，提取消息进行解析、检查，通过检查后封装为 Kafka 消息，通过 Produce 接口发送到 Kakfa 集群对应的 topic 分区中。
+* 当前收到消息数达到 BatchSize.MaxMessageCount 或消息尺寸过大，或超时时间达到 BatchTimeout，则发送分块消息 TTC-X 到 Kafka。
 * Kafka 集群维护多个 topic 分区。Kakfa 通过共识算法来确保写入到分区后的消息的一致性。即一旦写入分区，任何 Orderer 节点看到的都是相同的消息队列。
-* Orderer 节点在启动后，还默认对本地账本对应的 Kafka 分区数据进行监听，不断从 Kafka 拉取（Consume）新的交易消息，并对消息进行处理。满足一定策略情况下（超时或消息个数）还会将消息打包为区块。
+* Orderer 节点在启动后，还默认对本地账本对应的 Kafka 分区数据进行监听，不断从 Kafka 拉取（Consume）新的交易消息，并对消息进行处理。满足一定策略情况下（收到 TTX-C 或配置消息）还会将消息打包为区块。
 
 ### 分块决策
 
-当前消息数达到 `BatchSize.MaxMessageCount` 或超时时间达到 `BatchTimeout`，则切分消息为区块。
+收到分块消息 TTC-X，或收到配置交易，则切分之前从 Kafka 中收到的消息为区块，记录到本地账本结构中。
+
 

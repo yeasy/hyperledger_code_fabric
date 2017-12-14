@@ -139,11 +139,9 @@ if regularMessage.ConfigSeq < seq { // 消息中配置版本并非最新版本
 
 ```go
 commitConfigMsg := func(message *cb.Envelope, newOffset int64) {
-    logger.Debugf("[channel: %s] Received config message", chain.ChainID())
-    batch := chain.BlockCutter().Cut()
+    batch := chain.BlockCutter().Cut() // 尝试把收到的交易汇总
 
     if batch != nil { // 如果已经积累了一些交易，则先把它们打包为区块
-        logger.Debugf("[channel: %s] Cut pending messages into block", chain.ChainID())
         block := chain.CreateNextBlock(batch)
         metadata := utils.MarshalOrPanic(&ab.KafkaMetadata{
             LastOffsetPersisted:         receivedOffset - 1,
