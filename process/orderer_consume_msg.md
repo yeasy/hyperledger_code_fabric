@@ -1,18 +1,24 @@
 ## Orderer 节点对排序后消息的处理过程
 
-经过排序后的消息，可以认为在网络中已经达成了基本的共识。Orderer 会获取这些消息，进行对应处理（包括打包为区块，更新本地账本结构等）。
+经过 Kafka 排序后的消息，可以认为在网络中已经达成了对消息顺序的共识。Orderer 会不断从 Kafka 获取最新消息，进行本地处理（包括打包为区块，更新本地账本结构等）。
 
-以 Kafka 模式为例，Orderer 节点启动后，会调用 `orderer/consensus/kafka` 模块中 `chainImpl` 结构体的 `processMessagesToBlocks() ([]uint64, error)` 方法，持续获取 Kafka 对应分区中的消息。
+仍以 Kafka 模式为例，Orderer 节点启动后，会为每个账本结构调用 `orderer/consensus/kafka` 模块中 `chainImpl` 结构体的 `processMessagesToBlocks() ([]uint64, error)` 方法，持续获取 Kafka 对应分区中的消息并进行处理。
 
 
 ### 主要过程
 
-`chainImpl` 结构体的 `processMessagesToBlocks()` 方法不断从分区中 Consume 消息并进行处理，同时定时发送 TimeToCut 消息。
+`chainImpl` 结构体的 `processMessagesToBlocks()` 方法不断从分区中 Consume 消息，满足分块条件时，还会发送 TimeToCut（TTC） 消息到 Kakfa 对应分区中。
 
-处理消息类型包括 Connect 消息（Producer 启动后发出）、TimeToCut 消息和 Regular 消息（Fabric 消息）。分别调用对应方法进行处理，主要流程如下：
+从 Kakfa 收到的消息包括三种类型：
+
+* Connect 消息：Producer 启动后发出，测试与 Kafka 的连接。
+* TimeToCut 消息：收到该消息意味着当前可以进行分块。
+* Regular 消息（即 Fabric 的交易消息）：根据消息内容进行进一步处理，包括普通交易消息和配置消息。
+
+对于不同消息，分别调用对应方法进行处理。主要过程如下所示：
 
 ```go
-// orderer/consensus/kafka/chain.go
+// orderer/consensus/kafka/chain.go#chainImpl.processMessagesToBlocks()
 for {
 	select {
 		case <-chain.haltChan: // 链故障了，退出
@@ -30,21 +36,21 @@ for {
 			switch msg.Type.(type) {
 			case *ab.KafkaMessage_Connect: // Kafka 连接消息，忽略
 			case *ab.KafkaMessage_TimeToCut: // TTC，打包现有的一批消息为区块
-			case *ab.KafkaMessage_Regular: // 核心处理：Fabric 相关消息，包括配置更新、应用通道交易等
+			case *ab.KafkaMessage_Regular: // 核心处理：Fabric 相关消息，包括应用通道普通交易、配置更新等
 				chain.processRegular(msg.GetRegular(), in.Offset)
 		case <-chain.timer: //定期发出 TimeToCut 消息到 Kafka
 	}
 }
 ```
 
-### Fabric 相关消息的处理
+### Fabric 交易消息的处理
 
-对于 Fabric 相关消息（包括交易消息和配置消息），具体会调用 chainImpl 结构体的 `processRegular(regularMessage *ab.KafkaMessageRegular, receivedOffset int64) error` 方法进行处理。
+对于 Fabric 相关消息（包括普通交易消息和配置消息），具体会调用 chainImpl 结构体的 `processRegular(regularMessage *ab.KafkaMessageRegular, receivedOffset int64) error` 方法进行处理。
 
 该方法的核心代码如下：
 
 ```go
-// orderer/consensus/kafka/chain.go
+// orderer/consensus/kafka/chain.go#chainImpl.processRegular()
 func (chain *chainImpl) processRegular(regularMessage *ab.KafkaMessageRegular, receivedOffset int64) error {
 	env := &cb.Envelope{}
 	proto.Unmarshal(regularMessage.Payload, env) // 从载荷中解析出信封结构
