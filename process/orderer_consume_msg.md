@@ -13,7 +13,7 @@
 
 * Connect 消息：Producer 启动后发出，测试与 Kafka 的连接。
 * TimeToCut 消息：收到该消息意味着当前可以进行分块。
-* Regular 消息（即 Fabric 的交易消息）：根据消息内容进行进一步处理，包括普通交易消息和配置消息。
+* Fabric 交易消息（即 Regular 消息）：根据消息内容进行进一步处理，包括普通交易消息和配置消息。
 
 对于不同消息，分别调用对应方法进行处理。主要过程如下所示：
 
@@ -141,9 +141,10 @@ if regularMessage.ConfigSeq < seq { // 消息中配置版本并非最新版本
 }
 ```
 
-如果版本一致，则调用内部的 `commitConfigMsg(env)` 方法根据信封结构来产生区块。
+如果版本一致，则调用内部的 `commitConfigMsg(env)` 方法根据信封结构来产生区块，代码如下：
 
 ```go
+// orderer/consensus/kafka/chain.go
 commitConfigMsg := func(message *cb.Envelope, newOffset int64) {
     batch := chain.BlockCutter().Cut() // 尝试把收到的交易汇总
 
@@ -174,23 +175,10 @@ commitConfigMsg := func(message *cb.Envelope, newOffset int64) {
 
 由于每个配置消息会单独生成区块。因此，如果之前已经收到了一些普通交易消息，会先把这些消息生成区块。
 
-接下来，调用 `orderer/common/multichannel` 模块中 `BlockWriter` 结构体的 `CreateNextBlock(messages []*cb.Envelope) *cb.Block` 方法和 `WriteConfigBlock(block *cb.Block, encodedMetadataValue []byte)` 方法来分别打包区块和更新账本结构，代码如下：
+接下来，调用 `orderer/common/multichannel` 模块中 `BlockWriter` 结构体的 `CreateNextBlock(messages []*cb.Envelope) *cb.Block` 方法和 `WriteConfigBlock(block *cb.Block, encodedMetadataValue []byte)` 方法来分别打包区块和更新账本结构。
 
-```go
-// orderer/consensus/kafka/chain.go
-chain.lastOriginalOffsetProcessed = newOffset
-block := chain.CreateNextBlock([]*cb.Envelope{message})
-metadata := utils.MarshalOrPanic(&ab.KafkaMetadata{
-	LastOffsetPersisted:         receivedOffset,
-	LastOriginalOffsetProcessed: chain.lastOriginalOffsetProcessed,
-	LastResubmittedConfigOffset: chain.lastResubmittedConfigOffset,
-})
-chain.WriteConfigBlock(block, metadata)
-chain.lastCutBlockNumber++
-chain.timer = nil
-```
 
-其中，`WriteConfigBlock()` 方法执行解析消息和处理的主要逻辑，核心代码如下所示。
+其中，`WriteConfigBlock()` 方法执行解析消息和处理的主要逻辑（包括创建新的应用通道和更新已有通道的配置两种），核心代码如下所示。
 
 ```go
 // orderer/common/multichannel/blockwriter.go
@@ -221,5 +209,12 @@ func (bw *BlockWriter) WriteConfigBlock(block *cb.Block, encodedMetadataValue []
 	bw.WriteBlock(block, encodedMetadataValue)
 }	
 ```
+
+##### 创建新的应用通道
+创建新的本地账本结构并启动对应的轮询消息过程，实际调用 `orderer/common/multichannel.Registrar.newChain(configtx *cb.Envelope)` 方法。
+
+
+
+##### 更新已有通道配置
 
 

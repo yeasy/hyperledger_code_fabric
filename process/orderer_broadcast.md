@@ -76,7 +76,7 @@ func (r *Registrar) BroadcastChannelSupport(msg *cb.Envelope) (*cb.ChannelHeader
 
 	cs, ok := r.chains[chdr.ChannelId] // 应用通道、系统通道
 	if !ok {
-		cs = r.systemChannel // 空，则默认为系统通道，如收到新建应用通道请求时，Orderer 本地并没有该应用通道结构
+		cs = r.systemChannel // 空，则默认为系统通道。如收到新建应用通道请求时，Orderer 本地并没有该应用通道对应结构
 	}
 
 	isConfig := false
