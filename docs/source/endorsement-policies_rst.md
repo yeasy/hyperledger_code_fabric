@@ -1,1 +1,0 @@
-### endorsement-policies.rst

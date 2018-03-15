@@ -1,1 +1,0 @@
-### MAINTAINERS.rst

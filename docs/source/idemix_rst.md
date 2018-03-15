@@ -1,1 +1,0 @@
-### idemix.rst

@@ -1,1 +1,0 @@
-### jira_navigation.rst

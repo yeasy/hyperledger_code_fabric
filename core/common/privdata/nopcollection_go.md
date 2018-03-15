@@ -1,1 +1,0 @@
-#### nopcollection.go

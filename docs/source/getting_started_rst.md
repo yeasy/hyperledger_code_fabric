@@ -1,1 +1,0 @@
-### getting_started.rst

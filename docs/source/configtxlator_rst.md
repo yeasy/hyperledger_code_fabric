@@ -1,1 +1,0 @@
-### configtxlator.rst

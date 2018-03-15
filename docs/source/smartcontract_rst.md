@@ -1,1 +1,0 @@
-### smartcontract.rst

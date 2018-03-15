@@ -1,1 +1,0 @@
-### peer-chaincode-devmode.rst
