@@ -1,1 +1,0 @@
-#### chaincode_example04
