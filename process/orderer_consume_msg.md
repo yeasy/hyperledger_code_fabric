@@ -4,15 +4,14 @@
 
 ### 主要过程
 
-仍以 Kafka 模式为例，Orderer 节点启动后，会为每个账本结构调用 `orderer/consensus/kafka.chainImpl` 结构体的 `processMessagesToBlocks() ([]uint64, error)` 方法，持续获取 Kafka 对应分区中的消息并进行处理。该方法内是一个 for 循环，不断从对应 Kafka 分区中提取（Consume）消息，满足分块条件时，还会发送 TimeToCut（TTC） 消息到 Kakfa 对应分区中。
+仍以 Kafka 模式为例，Orderer 节点启动后，会为每个账本结构调用 `orderer/consensus/kafka.chainImpl` 结构体的 `processMessagesToBlocks() ([]uint64, error)` 方法，持续获取 Kafka 对应分区中的消息并进行处理。该方法内是一个 for 循环，不断从对应 Kafka 分区中提取（Consume）消息，满足分块条件（超时或消息的个数或大小满足预设条件）时，还会发送 TimeToCut（TTC） 消息到 Kakfa 对应分区中。
 
-从 Kakfa 收到的消息包括三种类型：
+主要逻辑如下图所示。
 
-* Connect 消息：Producer 启动后发出，测试与 Kafka 的连接。
-* TimeToCut 消息：收到该消息意味着当前可以进行分块。
-* Fabric 交易消息（即 Regular 消息）：根据消息内容进行进一步处理，包括普通交易消息和配置消息。
+[!Orderer processMessagesToBlocks()](_images/orderer_processMessagesToBlocks.png)
 
-对于不同消息，分别调用对应方法进行处理。主要过程如下所示：
+
+主要实现代码如下所示。
 
 ```go
 // orderer/consensus/kafka/chain.go#chainImpl.processMessagesToBlocks()
@@ -21,15 +20,15 @@ for {
 		case <-chain.haltChan: // 链故障了，退出
 		case kafkaErr := <-chain.channelConsumer.Errors(): //获取 Kakfa 消息发生错误
 			select {
-				case <-chain.errorChan: // 连接关闭，不进行任何操作
-				default: //其它错误，OutofRange，关闭 errorChan；否则进行超时重连
+				case <-chain.errorChan: // 连接已关闭，不进行任何操作
+				default: //其它错误，如 OffsetOutofRange，则关闭 errorChan；否则进行超时重连
 			}
 			select {
-				case <-chain.errorChan: // 连接仍然关闭，尝试后台进行重连
+				case <-chain.errorChan: // 连接仍然关闭，尝试后台发送 Connect 消息进行重连
 			}
-		case <-topicPartitionSubscriptionResumed: // 继续
-		case <-deliverSessionTimedOut: //访问超时，尝试后台进行重连
-		case in, ok := <-chain.channelConsumer.Messages(): // 核心过程：成功读取到 Kafka 消息，进行处理
+		case <-topicPartitionSubscriptionResumed: // 停止重连计时器，继续提取消息
+		case <-deliverSessionTimedOut: // 计时器超时，尝试后台进行重连
+		case in, ok := <-chain.channelConsumer.Messages(): // 核心过程：成功读取到正常 Kafka 消息，进行处理
 			switch msg.Type.(type) {
 			case *ab.KafkaMessage_Connect: // Kafka 连接消息，忽略
 			case *ab.KafkaMessage_TimeToCut: // TTC，打包现有的一批消息为区块
@@ -39,6 +38,16 @@ for {
 	}
 }
 ```
+
+课件，除了出错和超时外，从 Kakfa 收到的正常消息主要包括三种类型：
+
+* Connect 消息：Producer 启动后发出，测试与 Kafka 的连接。
+* TimeToCut 消息：收到该消息意味着当前可以进行分块。
+* Fabric 交易消息（即 Regular 消息）：根据消息内容进行进一步处理，包括普通交易消息和配置消息。
+
+对于不同消息，分别调用对应方法进行处理。主要过程如下所示：
+
+
 
 ### Fabric 交易消息的处理
 
