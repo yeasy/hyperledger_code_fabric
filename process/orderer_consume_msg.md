@@ -1,4 +1,4 @@
-## Orderer 节点对排序后消息的处理过程
+## Orderer 节点对排序后消息的处理
 
 经过 Kafka 排序后的消息，在网络中已经达成了对顺序的共识，后面可以执行提交动作。Orderer 会不断从 Kafka 获取排序后消息，进行提交处理（包括打包为区块，更新本地账本结构等）。
 
@@ -59,10 +59,12 @@ for {
 ```go
 // orderer/consensus/kafka/chain.go#chainImpl.processRegular()
 func (chain *chainImpl) processRegular(regularMessage *ab.KafkaMessageRegular, receivedOffset int64) error {
+	seq := chain.Sequence() // 当前最新的配置版本
 	env := &cb.Envelope{}
 	proto.Unmarshal(regularMessage.Payload, env) // 从载荷中解析出交易信封结构
+	
+	// 当前为兼容模式
 	if regularMessage.Class == ab.KafkaMessageRegular_UNKNOWN || !chain.SharedConfig().Capabilities().Resubmission() {
-		// 如果当前为兼容模式
 		chdr, err := utils.ChannelHeader(env) // 提取通道头
 		switch class {
 			case msgprocessor.ConfigMsg: // 配置消息
@@ -79,11 +81,44 @@ func (chain *chainImpl) processRegular(regularMessage *ab.KafkaMessageRegular, r
 	// 非兼容模式
 	switch regularMessage.Class {
 		case ab.KafkaMessageRegular_NORMAL: // 普通交易消息
-			chain.ProcessNormalMsg(env) // 检查消息合法性，分应用链和系统链两种情况
-			commitNormalMsg(env, chain.lastOriginalOffsetProcessed) // 处理交易消息，满足条件则切块，并写入本地账本
+			// 如果是二次提交的消息，并且之前已经被处理过，则直接返回
+			if regularMessage.OriginalOffset != 0 {
+				if regularMessage.OriginalOffset <= chain.lastOriginalOffsetProcessed {
+					return nil
+				}
+			}
+			
+			if regularMessage.ConfigSeq < seq { // 消息带的配置版本过旧
+				chain.ProcessNormalMsg(env) // 检查消息合法性，分应用链和系统链两种情况
+				chain.order(env, configSeq, receivedOffset) // 用新的配置版本和新的 offset，重新提交消息进行排序
+				return nil
+			}
+			offset := regularMessage.OriginalOffset
+			if offset == 0 {
+				offset = chain.lastOriginalOffsetProcessed
+			}
+			commitNormalMsg(env, offset) // 处理交易消息，满足条件则切块，并写入本地账本
+
 		case ab.KafkaMessageRegular_CONFIG: // 配置消息，包括通道头部类型为 CONFIG、CONFIG_UPDATE、ORDERER_TRANSACTION 三种
+			// 如果是二次提交的消息
+			if regularMessage.OriginalOffset != 0 {
+				if regularMessage.OriginalOffset <= chain.lastOriginalOffsetProcessed { // 之前已经被处理过，则直接返回
+					return nil
+				}
+				if regularMessage.OriginalOffset == chain.lastResubmittedConfigOffset && regularMessage.ConfigSeq == seq {
+					// 刚重新提交的消息，无需再次提交
+					close(chain.doneReprocessingMsgInFlight)
+				}
+				// 更新最新二次提交消息的偏移量
+				if chain.lastResubmittedConfigOffset < regularMessage.OriginalOffset {
+					chain.lastResubmittedConfigOffset = regularMessage.OriginalOffset
+				}
+			}
+
+			
 			chain.ProcessConfigMsg(env) //检查消息合法性，分应用链和系统链两种情况
 			commitConfigMsg(env, chain.lastOriginalOffsetProcessed) // 切块，写入账本。如果是 ORDERER_TRANSACTION 消息，创建新的应用通道账本；如果是 CONFIG 消息，更新配置。
+	}
 }
 ```
 
