@@ -62,17 +62,21 @@ func (chain *chainImpl) processRegular(regularMessage *ab.KafkaMessageRegular, r
 	env := &cb.Envelope{}
 	proto.Unmarshal(regularMessage.Payload, env) // 从载荷中解析出交易信封结构
 	if regularMessage.Class == ab.KafkaMessageRegular_UNKNOWN || !chain.SharedConfig().Capabilities().Resubmission() {
-	// 如果当前为兼容模式
-	chdr, err := utils.ChannelHeader(env) // 提取通道头
-	switch class {
-		case msgprocessor.ConfigMsg: // 配置消息
-			chain.ProcessConfigMsg(env, chain.lastOriginalOffsetProcessed) //检查消息合法性，分应用链和系统链两种情况
-			commitConfigMsg(env, chain.lastOriginalOffsetProcessed) // 切块，写入账本。如果是 ORDERER_TRANSACTION 消息，创建新的应用通道账本；如果是 CONFIG 消息，更新配置。
-		case msgprocessor.NormalMsg: // 普通消息
-			chain.ProcessNormalMsg(env) // 检查消息合法性，分应用链和系统链两种情况
-			commitNormalMsg(env, chain.lastOriginalOffsetProcessed) // 处理交易消息，满足条件则切块，并写入本地账本
-		case msgprocessor.ConfigUpdateMsg: // 配置更新消息
+		// 如果当前为兼容模式
+		chdr, err := utils.ChannelHeader(env) // 提取通道头
+		switch class {
+			case msgprocessor.ConfigMsg: // 配置消息
+				chain.ProcessConfigMsg(env, chain.lastOriginalOffsetProcessed) //检查消息合法性，分应用链和系统链两种情况
+				commitConfigMsg(env, chain.lastOriginalOffsetProcessed) // 切块，写入账本。如果是 ORDERER_TRANSACTION 消息，创建新的应用通道账本；如果是 CONFIG 消息，更新配置。
+			case msgprocessor.NormalMsg: // 普通消息
+				chain.ProcessNormalMsg(env) // 检查消息合法性，分应用链和系统链两种情况
+				commitNormalMsg(env, chain.lastOriginalOffsetProcessed) // 处理交易消息，满足条件则切块，并写入本地账本
+			case msgprocessor.ConfigUpdateMsg: // 配置更新消息，报错
+		}
+		return nil
 	}
+	
+	// 非兼容模式
 	switch regularMessage.Class {
 		case ab.KafkaMessageRegular_NORMAL: // 普通交易消息
 			chain.ProcessNormalMsg(env) // 检查消息合法性，分应用链和系统链两种情况
