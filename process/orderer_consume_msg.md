@@ -44,11 +44,15 @@ for {
 * TimeToCut 消息：收到该消息意味着当前可以进行分块。
 * Fabric 交易消息（即 Regular 消息）：根据消息内容进行进一步处理，包括普通交易消息和配置消息。
 
-对于不同消息，分别调用对应方法进行处理。主要过程如下所示：
+对于不同消息，分别调用对应方法进行处理。
 
 ### Fabric 交易消息的处理
 
 对于 Fabric 相关消息（包括普通交易消息和配置消息），具体会调用 chainImpl 结构体的 `processRegular(regularMessage *ab.KafkaMessageRegular, receivedOffset int64) error` 方法进行处理。
+
+主要过程如下所示：
+
+![Orderer processRegular()](_images/orderer_processRegular.png)
 
 该方法的核心代码如下：
 
@@ -56,7 +60,7 @@ for {
 // orderer/consensus/kafka/chain.go#chainImpl.processRegular()
 func (chain *chainImpl) processRegular(regularMessage *ab.KafkaMessageRegular, receivedOffset int64) error {
 	env := &cb.Envelope{}
-	proto.Unmarshal(regularMessage.Payload, env) // 从载荷中解析出信封结构
+	proto.Unmarshal(regularMessage.Payload, env) // 从载荷中解析出交易信封结构
 	switch regularMessage.Class {
 		case ab.KafkaMessageRegular_NORMAL: // 普通交易消息
 			chain.ProcessNormalMsg(env) // 检查消息合法性，分应用链和系统链两种情况
