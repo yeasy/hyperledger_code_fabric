@@ -2,12 +2,9 @@
 
 经过 Kafka 排序后的消息，在网络中已经达成了对顺序的共识，后面可以执行提交动作。Orderer 会不断从 Kafka 获取排序后消息，进行提交处理（包括打包为区块，更新本地账本结构等）。
 
-仍以 Kafka 模式为例，Orderer 节点启动后，会为每个账本结构调用 `orderer/consensus/kafka` 模块中 `chainImpl` 结构体的 `processMessagesToBlocks() ([]uint64, error)` 方法，持续获取 Kafka 对应分区中的消息并进行处理。
-
-
 ### 主要过程
 
-`chainImpl` 结构体的 `processMessagesToBlocks()` 方法不断从分区中 Consume 消息，满足分块条件时，还会发送 TimeToCut（TTC） 消息到 Kakfa 对应分区中。
+仍以 Kafka 模式为例，Orderer 节点启动后，会为每个账本结构调用 `orderer/consensus/kafka.chainImpl` 结构体的 `processMessagesToBlocks() ([]uint64, error)` 方法，持续获取 Kafka 对应分区中的消息并进行处理。该方法内是一个 for 循环，不断从对应 Kafka 分区中提取（Consume）消息，满足分块条件时，还会发送 TimeToCut（TTC） 消息到 Kakfa 对应分区中。
 
 从 Kakfa 收到的消息包括三种类型：
 
