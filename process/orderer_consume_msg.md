@@ -10,7 +10,6 @@
 
 ![Orderer processMessagesToBlocks()](_images/orderer_processMessagesToBlocks.png)
 
-
 主要实现代码如下所示。
 
 ```go
@@ -39,15 +38,13 @@ for {
 }
 ```
 
-课件，除了出错和超时外，从 Kakfa 收到的正常消息主要包括三种类型：
+其中，除了出错和超时外，最核心过程为处理从 Kakfa 收到的正常消息，主要包括三种类型：
 
-* Connect 消息：Producer 启动后发出，测试与 Kafka 的连接。
+* Connect 消息：Producer 启动后发出，刷新与 Kafka 的连接。
 * TimeToCut 消息：收到该消息意味着当前可以进行分块。
 * Fabric 交易消息（即 Regular 消息）：根据消息内容进行进一步处理，包括普通交易消息和配置消息。
 
 对于不同消息，分别调用对应方法进行处理。主要过程如下所示：
-
-
 
 ### Fabric 交易消息的处理
 
