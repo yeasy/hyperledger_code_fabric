@@ -1,6 +1,6 @@
 ## Orderer 节点对排序后消息的处理过程
 
-经过 Kafka 排序后的消息，可以认为在网络中已经达成了对消息顺序的共识。Orderer 会不断从 Kafka 获取最新消息，进行本地处理（包括打包为区块，更新本地账本结构等）。
+经过 Kafka 排序后的消息，在网络中已经达成了对顺序的共识，后面可以执行提交动作。Orderer 会不断从 Kafka 获取排序后消息，进行提交处理（包括打包为区块，更新本地账本结构等）。
 
 仍以 Kafka 模式为例，Orderer 节点启动后，会为每个账本结构调用 `orderer/consensus/kafka` 模块中 `chainImpl` 结构体的 `processMessagesToBlocks() ([]uint64, error)` 方法，持续获取 Kafka 对应分区中的消息并进行处理。
 
