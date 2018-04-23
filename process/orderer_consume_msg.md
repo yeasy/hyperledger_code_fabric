@@ -8,7 +8,7 @@
 
 主要逻辑如下图所示。
 
-[!Orderer processMessagesToBlocks()](_images/orderer_processMessagesToBlocks.png)
+![Orderer processMessagesToBlocks()](_images/orderer_processMessagesToBlocks.png)
 
 
 主要实现代码如下所示。
