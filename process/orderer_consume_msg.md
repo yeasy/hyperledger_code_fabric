@@ -296,12 +296,15 @@ func (r *Registrar) newChain(configtx *cb.Envelope) {
 		newChains[key] = value
 	}
 
+	// 获取通道配置，初始化消息处理器、区块写入器、kafka 连接器等数据结构
 	cs := newChainSupport(r, ledgerResources, r.consenters, r.signer)
 	chainID := ledgerResources.ConfigtxValidator().ChainID()
 
 	logger.Infof("Created and starting new chain %s", chainID)
 
 	newChains[string(chainID)] = cs
+	
+	// 启动轮询线程，从 kafka 读取消息并进行处理
 	cs.start()
 
 	r.chains = newChains
