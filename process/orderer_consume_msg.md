@@ -283,6 +283,30 @@ func (bw *BlockWriter) WriteConfigBlock(block *cb.Block, encodedMetadataValue []
 ##### 创建新的应用通道
 创建新的本地账本结构并启动对应的轮询消息过程，实际调用 `orderer/common/multichannel.Registrar.newChain(configtx *cb.Envelope)` 方法。
 
+该方法首先根据当前给定的配置来创建账本结构，之后初始化该账本对应的 ChainSupport 数据结构，最后调用 cs.start() 启动对应通道的消息处理服务。
+
+```go
+func (r *Registrar) newChain(configtx *cb.Envelope) {
+	ledgerResources := r.newLedgerResources(configtx)
+	ledgerResources.Append(blockledger.CreateNextBlock(ledgerResources, []*cb.Envelope{configtx}))
+
+	// Copy the map to allow concurrent reads from broadcast/deliver while the new chainSupport is
+	newChains := make(map[string]*ChainSupport)
+	for key, value := range r.chains {
+		newChains[key] = value
+	}
+
+	cs := newChainSupport(r, ledgerResources, r.consenters, r.signer)
+	chainID := ledgerResources.ConfigtxValidator().ChainID()
+
+	logger.Infof("Created and starting new chain %s", chainID)
+
+	newChains[string(chainID)] = cs
+	cs.start()
+
+	r.chains = newChains
+}
+```
 
 
 ##### 更新已有通道配置
