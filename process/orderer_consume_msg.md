@@ -287,7 +287,7 @@ func (bw *BlockWriter) WriteConfigBlock(block *cb.Block, encodedMetadataValue []
 
 ##### 更新已有通道配置
 
-首先检查配置信息是否合法，实际调用 common/configtx/validator.ValidatorImpl.Validate(configEnv *cb.ConfigEnvelope) error 方法，主要核对：
+首先，检查配置信息是否合法，实际调用 `common/configtx/validator.ValidatorImpl.Validate(configEnv *cb.ConfigEnvelope) error` 方法，主要核对：
 
 * 版本号需要比现在的递增 1；
 * 发起人拥有对应更新的权限；
