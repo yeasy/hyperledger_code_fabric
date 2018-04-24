@@ -66,6 +66,7 @@ func (chain *chainImpl) processRegular(regularMessage *ab.KafkaMessageRegular, r
 	// 当前为兼容模式
 	if regularMessage.Class == ab.KafkaMessageRegular_UNKNOWN || !chain.SharedConfig().Capabilities().Resubmission() {
 		chdr, err := utils.ChannelHeader(env) // 提取通道头
+		class := chain.ClassifyMsg(chdr)
 		switch class {
 			case msgprocessor.ConfigMsg: // 配置消息
 				chain.ProcessConfigMsg(env, chain.lastOriginalOffsetProcessed) //检查消息合法性，分应用链和系统链两种情况
@@ -106,7 +107,7 @@ func (chain *chainImpl) processRegular(regularMessage *ab.KafkaMessageRegular, r
 					return nil
 				}
 				if regularMessage.OriginalOffset == chain.lastResubmittedConfigOffset && regularMessage.ConfigSeq == seq {
-					// 刚重新提交的消息，无需再次提交
+					// 刚重新提交的消息，无需再次提交，解除对接收消息的阻塞
 					close(chain.doneReprocessingMsgInFlight)
 				}
 				// 更新最新二次提交消息的偏移量
@@ -119,7 +120,7 @@ func (chain *chainImpl) processRegular(regularMessage *ab.KafkaMessageRegular, r
 				chain.ProcessConfigMsg(env) //检查消息合法性，分应用链和系统链两种情况
 				chain.configure(configEnv, configSeq, receivedOffset) // 用新的配置版本和新的 offset，重新提交消息进行排序
 				chain.lastResubmittedConfigOffset = receivedOffset //更新最新的偏移量
-				chain.doneReprocessingMsgInFlight = make(chan struct{}) // 阻塞接收消息，先处理二次提交消息
+				chain.doneReprocessingMsgInFlight = make(chan struct{}) // 阻塞消息接收，等待当前二次提交消息的处理完成
 				return nil
 			}
 
