@@ -263,7 +263,7 @@ func (bw *BlockWriter) WriteConfigBlock(block *cb.Block, encodedMetadataValue []
 			bw.registrar.newChain(newChannelConfig)
 		case int32(cb.HeaderType_CONFIG): // 更新通道配置
 			configEnvelope, err := configtx.UnmarshalConfigEnvelope(payload.Data)
-			// 检查配置信息是否正确，实际调用 common/configtx/validator.ValidatorImpl.Validate(configEnv *cb.ConfigEnvelope) error 方法
+			// 检查配置信息是否合法，实际调用 common/configtx/validator.ValidatorImpl.Validate(configEnv *cb.ConfigEnvelope) error 方法
 			err = bw.support.Validate(configEnvelope)
 			// 写区块时配置不应该还有问题，有错误则 panic
 			if err != nil {
@@ -287,4 +287,9 @@ func (bw *BlockWriter) WriteConfigBlock(block *cb.Block, encodedMetadataValue []
 
 ##### 更新已有通道配置
 
-更新配置。
+首先检查配置信息是否合法，实际调用 common/configtx/validator.ValidatorImpl.Validate(configEnv *cb.ConfigEnvelope) error 方法，主要核对：
+
+* 版本号需要比现在的递增 1；
+* 发起人拥有对应更新的权限；
+* 配置更新交易结构正确。
+
