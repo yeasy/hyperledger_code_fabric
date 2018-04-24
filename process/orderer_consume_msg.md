@@ -235,13 +235,11 @@ commitConfigMsg := func(message *cb.Envelope, newOffset int64) {
     chain.lastCutBlockNumber++
     chain.timer = nil
 }
-
 ```
 
 由于每个配置消息都需要单独生成区块。因此，如果之前已经收到了一些普通交易消息，会先把这些消息生成区块。
 
 接下来，调用 `orderer/common/multichannel` 模块中 `BlockWriter` 结构体的 `CreateNextBlock(messages []*cb.Envelope) *cb.Block` 方法和 `WriteConfigBlock(block *cb.Block, encodedMetadataValue []byte)` 方法来分别打包区块和更新账本结构。
-
 
 其中，`WriteConfigBlock()` 方法执行解析消息和处理的主要逻辑（包括创建新的应用通道和更新已有通道的配置两种），核心代码如下所示。
 
@@ -259,8 +257,8 @@ func (bw *BlockWriter) WriteConfigBlock(block *cb.Block, encodedMetadataValue []
 	// 按照配置交易内容，执行对应操作
 	switch chdr.Type { // 排序后只有 ORDERER_TRANSACTION 和 CONFIG 两种类型消息
 		case int32(cb.HeaderType_ORDERER_TRANSACTION): // 新建应用通道
+			// 尝试解析配置更新消息，不成功则 panic
 			newChannelConfig, err := utils.UnmarshalEnvelope(payload.Data)
-
 			// 创建新的本地账本结构并启动对应的轮询消息过程，实际调用 orderer/common/multichannel.Registrar.newChain(configtx *cb.Envelope)
 			bw.registrar.newChain(newChannelConfig)
 		case int32(cb.HeaderType_CONFIG): // 更新通道配置
@@ -271,6 +269,7 @@ func (bw *BlockWriter) WriteConfigBlock(block *cb.Block, encodedMetadataValue []
 			if err != nil {
 			logger.Panicf("Told to write a config block with new config, but could not apply it: %s", err)
 			}
+			// 更新配置
 			bundle, err := bw.support.CreateBundle(chdr.ChannelId, configEnvelope.Config)
 			bw.support.Update(bundle)
 
@@ -288,4 +287,4 @@ func (bw *BlockWriter) WriteConfigBlock(block *cb.Block, encodedMetadataValue []
 
 ##### 更新已有通道配置
 
-
+更新配置。
