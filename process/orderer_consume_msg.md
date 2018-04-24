@@ -238,7 +238,7 @@ commitConfigMsg := func(message *cb.Envelope, newOffset int64) {
 
 ```
 
-由于每个配置消息会单独生成区块。因此，如果之前已经收到了一些普通交易消息，会先把这些消息生成区块。
+由于每个配置消息都需要单独生成区块。因此，如果之前已经收到了一些普通交易消息，会先把这些消息生成区块。
 
 接下来，调用 `orderer/common/multichannel` 模块中 `BlockWriter` 结构体的 `CreateNextBlock(messages []*cb.Envelope) *cb.Block` 方法和 `WriteConfigBlock(block *cb.Block, encodedMetadataValue []byte)` 方法来分别打包区块和更新账本结构。
 
@@ -265,6 +265,12 @@ func (bw *BlockWriter) WriteConfigBlock(block *cb.Block, encodedMetadataValue []
 			bw.registrar.newChain(newChannelConfig)
 		case int32(cb.HeaderType_CONFIG): // 更新通道配置
 			configEnvelope, err := configtx.UnmarshalConfigEnvelope(payload.Data)
+			// 检查配置信息是否正确，实际调用 common/configtx/validator.ValidatorImpl.Validate(configEnv *cb.ConfigEnvelope) error 方法
+			err = bw.support.Validate(configEnvelope)
+			// 写区块时配置不应该还有问题，有错误则 panic
+			if err != nil {
+			logger.Panicf("Told to write a config block with new config, but could not apply it: %s", err)
+			}
 			bundle, err := bw.support.CreateBundle(chdr.ChannelId, configEnvelope.Config)
 			bw.support.Update(bundle)
 
