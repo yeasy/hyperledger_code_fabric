@@ -115,8 +115,14 @@ func (chain *chainImpl) processRegular(regularMessage *ab.KafkaMessageRegular, r
 				}
 			}
 
-			
-			chain.ProcessConfigMsg(env) //检查消息合法性，分应用链和系统链两种情况
+			if regularMessage.ConfigSeq < seq { // 消息带的配置版本过旧
+				chain.ProcessConfigMsg(env) //检查消息合法性，分应用链和系统链两种情况
+				chain.configure(configEnv, configSeq, receivedOffset) // 用新的配置版本和新的 offset，重新提交消息进行排序
+				chain.lastResubmittedConfigOffset = receivedOffset //更新最新的偏移量
+				chain.doneReprocessingMsgInFlight = make(chan struct{}) // 阻塞接收消息，先处理二次提交消息
+				return nil
+			}
+
 			commitConfigMsg(env, chain.lastOriginalOffsetProcessed) // 切块，写入账本。如果是 ORDERER_TRANSACTION 消息，创建新的应用通道账本；如果是 CONFIG 消息，更新配置。
 	}
 }
