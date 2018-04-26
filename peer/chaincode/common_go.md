@@ -4,7 +4,7 @@
 
 #### checkspec
 
-
+检查chaincode
 
 #### chaincodeInvokeOrQuery
 
