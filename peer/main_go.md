@@ -10,8 +10,8 @@
 
 main 函数主要完成子命令的注册和一些初始化配置工作，为执行子命令准备好环境，包括：
 
+* mainCmd.AddCommand()注册各个子命令；
 * 调用 InitConfig() 从本地的 yaml、环境变量以及命令行选项中读取 Peer 命令相关的配置信息；
-* 之后注册各个子命令；
 * 最后调用 InitCrypto() 从本地读入 MSP 配置文件和 BCCSP 配置，初始化 MSP 部分。初始化会创建本地的一个 bccspmsp 结构（msp.mspimpl.go），然后利用本地读取的 MSP（包括各种证书和私钥等） 和 BCCSP 配置进行初始化。
 
 peer 的 MSP 文件路径从 `peer.mspConfigPath` 变量读取（相对路径，前面会拼接上配置文件路径，默认为 $FABRIC_CFG_PATH/msp）；默认的 mspID 是 `peer.localMspId`（DEFAULT）。BCCSP 配置从 `peer.BCCSP` 中读取。
