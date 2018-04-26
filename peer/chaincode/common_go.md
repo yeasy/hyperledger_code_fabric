@@ -6,6 +6,10 @@
 
 检查chaincode
 
+#### getChaincodeDeploymentSpec
+
+获得chaincode描述
+
 #### chaincodeInvokeOrQuery
 
 * 获取链码详细信息（含有发出的指令里的信息，比如-C 通道、-n 名字、-c 参数）。
