@@ -44,9 +44,7 @@
 * 如果需要跟orderer通信，那么创建跟orderer交互的BroadcastClient。这里还有一层判断，如果配置没有指定orderer的地址，那么使用GetOrdererEndpointOfChainFnc函数获取所有orderer的地址，取第一个作为通信orderer，调用GetBroadcastClientFnc函数获取BroadcastClient，如果指定了orderer地址，那么直接调用GetBroadcastClientFnc获取BroadcastClient。
 * 根据上面获得信息组装ChaincodeCmdFactory返回
 
+#### ChaincodeInvokeOrQuery\(spec \*pb.ChaincodeSpec...\)
 
-
-#### ChaincodeInvokeOrQuery\(spec \*...\)
-
-
+此函数跟上面解析命令的chaincodeInvokeOrQuery函数区分开，这里是真正的chaincode调用函数
 
