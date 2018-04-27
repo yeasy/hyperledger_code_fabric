@@ -46,5 +46,7 @@
 
 #### ChaincodeInvokeOrQuery\(spec \*pb.ChaincodeSpec...\)
 
-此函数跟上面解析命令的chaincodeInvokeOrQuery函数区分开，这里是真正的chaincode调用函数
+此函数跟上面解析命令的chaincodeInvokeOrQuery函数区分开，这里是真正的chaincode调用函数。
+
+
 
