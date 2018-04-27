@@ -29,5 +29,11 @@
 * 如果chaincode是要执行的，检查proposalResponse，调用GetChaincodeAction进一步执行。
 * 返回nil。 
 
+#### getCollectionConfigFromFile
+
+#### getCollectionConfigFromBytes
+
+从文件中读取配置集合
+
 
 
