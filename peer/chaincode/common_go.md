@@ -4,7 +4,7 @@
 
 #### checkspec
 
-检查chaincode详细描述有效性。
+根据不同的运行语言检查chaincode详细描述有效性。
 
 #### getChaincodeDeploymentSpec
 
