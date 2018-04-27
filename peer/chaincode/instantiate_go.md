@@ -1,4 +1,5 @@
 ### instantiate.go
+
 响应 `peer chaincode instantiate` 命令，生成智能合约容器，在 peer 节点上启动。
 
 例如
@@ -8,6 +9,12 @@ peer chaincode instantiate -n test_cc -c '{"Args":["init","a","100","b","200"]}'
 ```
 
 instantiate 支持包括 policy、channel、escc、vscc 在内更多的命令行参数。
+
+#### instantiateCmd
+
+生成instantiateCmd，此cmd定义`peer chaincode instantiate` 命令最终调用chaincodeDeploy 函数。此函数会被chaincode cmd子命令注册时调用。
+
+#### chaincodeDeploy
 
 命令调用 chaincodeDeploy 方法。
 
@@ -26,3 +33,4 @@ instantiate 支持包括 policy、channel、escc、vscc 在内更多的命令行
 整体流程如下图所示。
 
 ![peer chaincode instantiate 过程](../_images/peer_chaincode_instantiate.png)
+
