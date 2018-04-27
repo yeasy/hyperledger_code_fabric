@@ -12,7 +12,7 @@
 
 #### getChaincodeSpec
 
-从cli cmd获得chaincode描述。
+从cli cmd获得chaincode详细描述，具体的命令参数已经解析放入了chaincode.go里面定义的那些全局变量，把这些全局变量汇总成结构pb.ChaincodeSpec。
 
 #### chaincodeInvokeOrQuery
 
