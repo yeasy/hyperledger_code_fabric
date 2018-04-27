@@ -46,3 +46,7 @@
 
 
 
+#### ChaincodeInvokeOrQuery\(spec \*...\)
+
+
+
