@@ -10,9 +10,9 @@ peer chaincode instantiate -n test_cc -c '{"Args":["init","a","100","b","200"]}'
 
 instantiate 支持包括 policy、channel、escc、vscc 在内更多的命令行参数。
 
-#### installCmd
+#### instantiateCmd
 
-生成installCmd，此cmd定义`peer chaincode install`命令最终调用chaincodeInstall函数。此函数会被chaincode cmd子命令注册时调用。
+生成instantiateCmd，此cmd定义`peer chaincode instantiate` 命令最终调用chaincodeDeploy 函数。此函数会被chaincode cmd子命令注册时调用。
 
 #### chaincodeDeploy
 
