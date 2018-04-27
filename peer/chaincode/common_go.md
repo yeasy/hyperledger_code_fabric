@@ -48,5 +48,10 @@
 
 此函数跟上面解析命令的chaincodeInvokeOrQuery函数区分开，这里是真正的chaincode调用函数。
 
+* 创建chaincode执行描述结构，创建proposal
+* 对proposal签名
+* 使用grpc调用endorserClient.ProcessProposal，触发endorer执行proposal
+* 得到proposalResponse，如果是查询类命令直接返回结果；如果是执行交易类，需要对交易签名CreateSignedTx，然后调用BroadcastClient发送给orderer进行排序
+
 
 
