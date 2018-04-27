@@ -10,11 +10,12 @@
 
 main 函数主要完成子命令的注册和一些初始化配置工作，为执行子命令准备好环境，包括：
 
-* mainCmd.AddCommand()注册各个子命令；
-* 调用 InitConfig() 从本地的 yaml、环境变量以及命令行选项中读取 Peer 命令相关的配置信息；
-* 最后调用 InitCrypto() 从本地读入 MSP 配置文件和 BCCSP 配置，初始化 MSP 部分。初始化会创建本地的一个 bccspmsp 结构（msp.mspimpl.go），然后利用本地读取的 MSP（包括各种证书和私钥等） 和 BCCSP 配置进行初始化。
+* mainCmd.AddCommand\(\)注册各个子命令；
+* 调用 InitConfig\(\) 从本地的 yaml、环境变量以及命令行选项中读取 Peer 命令相关的配置信息；
+* 调用 InitCrypto\(\) 从本地读入 MSP 配置文件和 BCCSP 配置，初始化 MSP 部分。初始化会创建本地的一个 bccspmsp 结构（msp.mspimpl.go），然后利用本地读取的 MSP（包括各种证书和私钥等） 和 BCCSP 配置进行初始化。
+* 最后调用
 
-peer 的 MSP 文件路径从 `peer.mspConfigPath` 变量读取（相对路径，前面会拼接上配置文件路径，默认为 $FABRIC_CFG_PATH/msp）；默认的 mspID 是 `peer.localMspId`（DEFAULT）。BCCSP 配置从 `peer.BCCSP` 中读取。
+peer 的 MSP 文件路径从 `peer.mspConfigPath` 变量读取（相对路径，前面会拼接上配置文件路径，默认为 $FABRIC\_CFG\_PATH/msp）；默认的 mspID 是 `peer.localMspId`（DEFAULT）。BCCSP 配置从 `peer.BCCSP` 中读取。
 
 ### MSP 初始化
 
@@ -24,22 +25,21 @@ peer 的 MSP 文件路径从 `peer.mspConfigPath` 变量读取（相对路径，
 
 ```go
 func InitCrypto(mspMgrConfigDir string, localMSPID string) error {
-	// Init the BCCSP
-	var bccspConfig *factory.FactoryOpts
-	err := viperutil.EnhancedExactUnmarshalKey("peer.BCCSP", &bccspConfig)
-	if err != nil {
-		return fmt.Errorf("Could not parse YAML config [%s]", err)
-	}
+    // Init the BCCSP
+    var bccspConfig *factory.FactoryOpts
+    err := viperutil.EnhancedExactUnmarshalKey("peer.BCCSP", &bccspConfig)
+    if err != nil {
+        return fmt.Errorf("Could not parse YAML config [%s]", err)
+    }
 
-	err = mspmgmt.LoadLocalMsp(mspMgrConfigDir, bccspConfig, localMSPID)
-	if err != nil {
-		return fmt.Errorf("Fatal error when setting up MSP from directory %s: err %s\n", mspMgrConfigDir, err)
-	}
+    err = mspmgmt.LoadLocalMsp(mspMgrConfigDir, bccspConfig, localMSPID)
+    if err != nil {
+        return fmt.Errorf("Fatal error when setting up MSP from directory %s: err %s\n", mspMgrConfigDir, err)
+    }
 
-	return nil
+    return nil
 }
 ```
-
 
 其中，默认的 BCCSP 配置从 `peer.BCCSP` 中读取，示例配置为
 
@@ -63,7 +63,7 @@ BCCSP:
 
 首先，调用 msp/cofnigbuilder.go 中的 GetLocalMspConfig 方法，进一步调用 getMspConfig 方法。getMspConfig 方法导入所有提供的 PEM 格式的证书和密钥文件，并从 MSP 配置目录下查找 config.yaml 并读取 OUIdentifier 信息。
 
-之后通过 `GetLocalMSP().Setup(conf)` 进行配置。GetLocalMSP()会通过 msp.NewBccspMsp()生成一个 msp.bccspmsp 对象。之后，调用 msp/mspimpl.go 中的 Setup 方法，将读入的证书文件等配置写到 msp.bccspmsp 对象中。
+之后通过 `GetLocalMSP().Setup(conf)` 进行配置。GetLocalMSP\(\)会通过 msp.NewBccspMsp\(\)生成一个 msp.bccspmsp 对象。之后，调用 msp/mspimpl.go 中的 Setup 方法，将读入的证书文件等配置写到 msp.bccspmsp 对象中。
 
 至此，完成 MSP 的初始化工作。
 
