@@ -8,11 +8,19 @@
 
 #### getChaincodeDeploymentSpec
 
-获得chaincode描述
+获得chaincode部署详细描述。
+
+* checkSpec检查chaincode描述
+
+* GetChaincodePackageBytes获得docker容器中不同运行平台的chaincode字节码
+
+* 构造pb.ChaincodeDeploymentSpec结构返回
 
 #### getChaincodeSpec
 
-从cli cmd获得chaincode详细描述，具体的命令参数已经解析放入了chaincode.go里面定义的那些全局变量，把这些全局变量汇总成结构pb.ChaincodeSpec。
+* checkChaincodeCmdParams检查命令参数有效性
+
+* 从cli cmd获得chaincode详细描述，具体的命令参数已经解析放入了chaincode.go里面定义的那些全局变量，把这些全局变量汇总成结构pb.ChaincodeSpec。
 
 #### chaincodeInvokeOrQuery
 
