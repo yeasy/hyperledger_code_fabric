@@ -12,7 +12,7 @@
 
 * checkSpec检查chaincode描述
 
-* GetChaincodePackageBytes获得docker容器中不同运行平台的chaincode字节码
+* GetChaincodePackageBytes获得docker容器中不同运行语言下的chaincode代码，如golang会将代码压缩为.tar.gz文件，具体见core/platforms。
 
 * 构造pb.ChaincodeDeploymentSpec结构返回
 
