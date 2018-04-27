@@ -42,6 +42,7 @@
 * 如果需要跟endorser通信，那么创建endorserClient，参见peerclient.go的NewPeerClientFromEnv函数。
 * 获取默认的签名实体
 * 如果需要跟orderer通信，那么创建跟orderer交互的client，这里还有一层判断，如果配置指定了orderer的地址，那么使用GetOrdererEndpointOfChainFnc获取，如果指定了orderer地址，那么使用GetBroadcastClientFnc获取。
+* 根据上面获得信息组装ChaincodeCmdFactory返回
 
 
 
