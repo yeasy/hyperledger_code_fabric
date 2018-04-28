@@ -5,7 +5,7 @@
 例如
 
 ```bash
-peer chaincode invoke -n test_cc -c '{"Args":["invoke","a","b","10"]}' -o orderer0:7050
+peer chaincode list --installed -C mychannel
 ```
 
 命令会调用 chaincodeInvoke。
