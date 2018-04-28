@@ -1,11 +1,11 @@
 ### signpackage.go
 
-响应 `peer chaincode signpackage` 命令，将某个 chaincode 打包为 deployment 的 spec。
+响应 `peer chaincode signpackage` 命令，将某个 chaincode 打包后的package进行签名。
 
 例如
 
 ```bash
-$ peer chaincode signpackage -n test_cc -c '{"Args":["init","a","100","b","200"]}' -p github.com/hyperledger/fabric/examples/chaincode/go/chaincode_example02 -v 1.0  test_cc_1.0.pkg
+$ peer chaincode signpackage <inputpackage> <outputpackage>
 ```
 
 命令会调用 signpackage方法。
