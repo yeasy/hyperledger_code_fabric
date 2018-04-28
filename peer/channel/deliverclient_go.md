@@ -14,7 +14,13 @@
 
 #### seekHelper
 
-查询block的接口函数，先构造查询信息seekinfo，然后调用CreateSignedEnvelopeWithTLSBinding构造查询envelop结构。
+查找block的接口函数，先构造查询信息seekinfo，然后调用CreateSignedEnvelopeWithTLSBinding构造查询envelope结构。
+
+#### seekSpecified
+
+查找指定区块，根据block num参数构造参数并调用seekhelper返回查找envelope，然后调用deliverclient发送查找信息给orderer。
+
+
 
 
 
