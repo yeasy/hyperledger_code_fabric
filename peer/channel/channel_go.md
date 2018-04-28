@@ -23,15 +23,15 @@ func Cmd(cf *ChannelCmdFactory) *cobra.Command {
 
 #### InitCmdFactory
 
-所有 channel 子命令都会先调用 InitCmdFactory 来进行必要的初始化，根据命令需求来生成 endorserClient、BroadcastClient 和 DeliverClient等。
+所有 channel 子命令都会先调用 InitCmdFactory 来进行必要的初始化，根据命令需求来生成ChannelCmdFactory。
 
 ```go
 type ChannelCmdFactory struct {
-	EndorserClient   pb.EndorserClient
-	Signer           msp.SigningIdentity
-	BroadcastClient  common.BroadcastClient
-	DeliverClient    deliverClientIntf
-	BroadcastFactory BroadcastClientFactory
+    EndorserClient   pb.EndorserClient
+    Signer           msp.SigningIdentity
+    BroadcastClient  common.BroadcastClient
+    DeliverClient    deliverClientIntf
+    BroadcastFactory BroadcastClientFactory
 }
 ```
 
