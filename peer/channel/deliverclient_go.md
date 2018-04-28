@@ -6,5 +6,5 @@
 
 创建一个deliverclient。
 
-
+先调用peer/common/orderclient.go NewOrdererClientFromEnv，根据order配置文件创建grpc client。
 
