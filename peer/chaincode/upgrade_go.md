@@ -1,10 +1,11 @@
 ### upgrade.go
+
 响应 `peer chaincode upgrade` 命令，升级某个 chaincode 到新的版本。
 
 例如
 
 ```bash
-$ peer chaincode upgrade -n test_cc  -o orderer0:7050 -c '{"Args":["init","a","100","b","200"]}' -v 1.1 
+$ peer chaincode upgrade -n test_cc  -o orderer0:7050 -c '{"Args":["init","a","100","b","200"]}' -v 1.1
 ```
 
 命令会调用 chaincodeUpgrade。
@@ -22,4 +23,6 @@ upgrade 方法主要过程如下：
 * 调用 EndorserClient，发送 gprc 消息，将签名后 Proposal 发给指定的 peer。
 * 根据 peer 的返回，创建一个 Envelop 结构（SignedTx）并进行签名。
 * 将 Envelop 通过 grpc 通道发给 orderer。
+
+
 
