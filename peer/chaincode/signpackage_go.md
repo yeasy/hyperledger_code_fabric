@@ -14,10 +14,10 @@ $ peer chaincode signpackage <inputpackage> <outputpackage>
 
 之后主要过程如下：
 
-* 根据传入的各种参数，生成 ChaincodeSpec。
-* 生成 ChaincodeDeploymentSpec 结构。
-* 根据 CDS 等创建 签名后的 ChaincodeDeploymentSpec，并封装为 Envelop 结构（其中数据是一个 SignedChaincodeDeploymentSpec）。
-* 将 Envelop 结构写到本地指定的文件中。
+* 根据传入的需要签名文件参数，读出文件内容，调用UnmarshalEnvelopeOrPanic进行解码。
+
+* 调用SignExistingPackage进行签名，并编码。
+* 将编码后内容写到输出文件中。
 
 
 
