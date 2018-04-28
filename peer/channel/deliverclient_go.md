@@ -32,3 +32,9 @@
 
 读取区块信息。调用deliver client recv函数从orderer获取区块信息。
 
+#### getSpecifiedBlock
+
+先调用seekSpecified发送查找信息，然后调用readBlock接收block信息。
+
+
+
