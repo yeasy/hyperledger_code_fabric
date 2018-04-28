@@ -8,6 +8,7 @@
 * 调用CreateProposalFromCIS创建交易proposal
 * 对proposal进行签名
 * EndorserClient.ProcessProposal发送给eddorser进行背书
+* 获得chaincode执行结果，解码获得BlockchainInfo结构信息进行返回
 
 
 
