@@ -12,7 +12,7 @@ peer chaincode list --installed -C mychannel
 
 首先会调用 InitCmdFactory，初始化 Endosermentclient、Signer 等结构。这一步对于所有 chaincode 子命令来说都是类似的，个别会初始化不同的结构。
 
-之后根据传入的参数判断是查询已安装化的chaincode，则调用 CreateGetInstalledChaincodesProposal方法；判断是查询channel中已实例化的chaincode，则调用 CreateGetInstalledChaincodesProposal方法。
+之后根据传入的参数判断是查询已安装化的chaincode，则调用 CreateGetInstalledChaincodesProposal方法；判断是查询channel中已实例化的chaincode，则调用 CreateGetChaincodesProposal方法。
 
 chaincodeInvokeOrQuery 方法主要过程如下：
 
