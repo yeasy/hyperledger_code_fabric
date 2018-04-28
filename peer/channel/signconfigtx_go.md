@@ -4,7 +4,7 @@
 
 命令处理函数是sign，首先通过 InitCmdFactory 进行初始化，然后再对传入的configtx文件进行签名，流程如下。
 
-* 构造qscc类型的chaincode执行描述结构 ChaincodeInvocationSpec
+* 读取configtx文件
 * 调用CreateProposalFromCIS创建交易proposal
 * 对proposal进行签名
 * EndorserClient.ProcessProposal发送给eddorser进行背书
