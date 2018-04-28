@@ -20,7 +20,17 @@
 
 查找指定区块，根据block num参数构造参数并调用seekhelper返回查找envelope，然后调用deliverclient发送查找信息给orderer。
 
+#### seekOldest
 
+查找最老的区块，构造olderst参数并调用seekhelper返回查找envelope，然后调用deliverclient发送查找信息给orderer。
+
+#### seekNewest
+
+查找最新的区块，构造newest参数并调用seekhelper返回查找envelope，然后调用deliverclient发送查找信息给orderer。
+
+#### readBlock
+
+读取区块信息。
 
 
 
