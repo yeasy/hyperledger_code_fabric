@@ -8,18 +8,32 @@
 // Cmd returns the cobra command for Node
 func Cmd(cf *ChannelCmdFactory) *cobra.Command {
 
-	AddFlags(channelCmd)
-	channelCmd.AddCommand(createCmd(cf))
-	channelCmd.AddCommand(fetchCmd(cf))
-	channelCmd.AddCommand(joinCmd(cf))
-	channelCmd.AddCommand(listCmd(cf))
-	channelCmd.AddCommand(updateCmd(cf))
-	channelCmd.AddCommand(signconfigtxCmd(cf))
-	channelCmd.AddCommand(getinfoCmd(cf))
+    AddFlags(channelCmd)
+    channelCmd.AddCommand(createCmd(cf))
+    channelCmd.AddCommand(fetchCmd(cf))
+    channelCmd.AddCommand(joinCmd(cf))
+    channelCmd.AddCommand(listCmd(cf))
+    channelCmd.AddCommand(updateCmd(cf))
+    channelCmd.AddCommand(signconfigtxCmd(cf))
+    channelCmd.AddCommand(getinfoCmd(cf))
 
-	return channelCmd
+    return channelCmd
 }
 ```
 
-所有 channel 子命令都会先调用 InitCmdFactory 来进行必要的初始化，根据命令需求来生成 endorserClient、BroadcastClient 和 DeliverClient。
+#### InitCmdFactory
+
+所有 channel 子命令都会先调用 InitCmdFactory 来进行必要的初始化，根据命令需求来生成 endorserClient、BroadcastClient 和 DeliverClient等。
+
+```go
+type ChannelCmdFactory struct {
+	EndorserClient   pb.EndorserClient
+	Signer           msp.SigningIdentity
+	BroadcastClient  common.BroadcastClient
+	DeliverClient    deliverClientIntf
+	BroadcastFactory BroadcastClientFactory
+}
+```
+
+
 
