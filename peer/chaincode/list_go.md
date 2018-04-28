@@ -14,14 +14,9 @@ peer chaincode list --installed -C mychannel
 
 之后根据传入的参数判断是查询已安装化的chaincode，则调用 CreateGetInstalledChaincodesProposal方法；判断是查询channel中已实例化的chaincode，则调用 CreateGetChaincodesProposal方法创建对应的proposal。
 
-chaincodeInvokeOrQuery 方法主要过程如下：
+签名后，通过 endorserClient 发送给指定的 peer。
 
-* 生成 ChaincodeSpec。
-* 根据 CS、chainID、签名实体等，生成 ChaincodeInvocationSpec。
-* 根据 CIS，生成 Proposal，并进行签名。
-* 签名后，通过 endorserClient 发送给指定的 peer。
-* 利用获取到的 Response，创建 SignedTX，发送给 orderer。
-* 成功的话，输出成功消息，注意 invoke 是异步操作，无法获取到执行结果。
+获得返回结果进行输出。
 
-注意 invoke 和 query 的区别，query 不需要创建 SignedTx 发送到 orderer，而且会返回结果。
+
 
