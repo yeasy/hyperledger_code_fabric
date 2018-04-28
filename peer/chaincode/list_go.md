@@ -8,7 +8,7 @@
 peer chaincode list --installed -C mychannel
 ```
 
-命令会调用 chaincodeInvoke。
+命令会调用 getChaincodes。
 
 首先会调用 InitCmdFactory，初始化 Endosermentclient、Signer 等结构。这一步对于所有 chaincode 子命令来说都是类似的，个别会初始化不同的结构。
 
