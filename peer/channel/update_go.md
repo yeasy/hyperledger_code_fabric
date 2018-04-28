@@ -8,7 +8,7 @@
 * UnmarshalEnvelope解码文件信息，输出到envelope结构
 * sanityCheckAndSignConfigTx对envelope进行签名
 * 编码签名后的envelope信息
-  写回原始文件
+* 调用broadcastClient.Send通知orderer进行更新
 
 
 
