@@ -1,8 +1,8 @@
 ### update.go
 
-`peer channel`getinfo命令的入口。
+`peer channel update`命令的入口。
 
-命令处理函数是getinfo，首先通过 InitCmdFactory 进行初始化，然后再调用getBlockChainInfo获取信息，流程如下。
+命令处理函数是update，首先通过 InitCmdFactory 进行初始化，然后再调用getBlockChainInfo获取信息，流程如下。
 
 * 构造qscc类型的chaincode执行描述结构 ChaincodeInvocationSpec
 * 调用CreateProposalFromCIS创建交易proposal
