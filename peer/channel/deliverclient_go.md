@@ -30,7 +30,5 @@
 
 #### readBlock
 
-读取区块信息。
-
-
+读取区块信息。调用deliver client recv函数从orderer获取区块信息。
 
