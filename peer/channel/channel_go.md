@@ -35,5 +35,5 @@ type ChannelCmdFactory struct {
 }
 ```
 
-调用GetDefaultSignerFnc创建signer，赋值BroadcastFactory（BroadcastClient可以由此factory获得），调用GetEndorserClientFnc创建与endorser通信EndorserClient，join和list子命令需要；调用newDeliverClient获得与orderer通信DeliverClient，create和fetch。子命令需要
+调用GetDefaultSignerFnc创建signer，赋值BroadcastFactory（BroadcastClient可以由此factory获得），调用GetEndorserClientFnc创建与endorser通信EndorserClient，join和list子命令需要；调用newDeliverClient获得与orderer通信DeliverClient，create和fetch。子命令需要。
 
