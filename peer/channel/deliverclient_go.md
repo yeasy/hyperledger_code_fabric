@@ -36,5 +36,15 @@
 
 先调用seekSpecified发送查找信息，然后调用readBlock接收block信息。
 
+#### getOldestBlock
 
+先调用seekOldest发送查找信息，然后调用readBlock接收block信息。
+
+#### getNewestBlock
+
+先调用seekNewest发送查找信息，然后调用readBlock接收block信息。
+
+#### getGenesisBlock
+
+获取创世块，先启动一个超时定时器，然后调用DeliverClient.getSpecifiedBlock\(0\)获取第一个区块，如果失败则close deliverclient，重新初始化InitCmdFactory，睡眠200ms后继续重试，如果查询成功则返回；如果超时则返回失败。
 
