@@ -12,5 +12,9 @@
 
 最后计算证书的sha256 hash值保存，构造deliverclient结构返回。
 
+#### seekHelper
+
+查询block的接口函数，先构造查询信息seekinfo，然后调用CreateSignedEnvelopeWithTLSBinding构造查询envelop结构。
+
 
 
