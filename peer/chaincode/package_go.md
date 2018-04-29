@@ -1,4 +1,5 @@
 ### package.go
+
 响应 `peer chaincode package` 命令，将某个 chaincode 打包为 deployment 的 spec。
 
 例如
@@ -17,4 +18,6 @@ $ peer chaincode package -n test_cc -c '{"Args":["init","a","100","b","200"]}' -
 * 生成 ChaincodeDeploymentSpec 结构。
 * 根据 CDS 等创建 签名后的 ChaincodeDeploymentSpec，并封装为 Envelop 结构（其中数据是一个 SignedChaincodeDeploymentSpec）。
 * 将 Envelop 结构写到本地指定的文件中。
+
+
 

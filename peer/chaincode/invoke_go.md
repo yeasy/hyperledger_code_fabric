@@ -1,4 +1,5 @@
 ### invoke.go
+
 响应 `peer chaincode invoke` 命令，执行某个 chaincode 中操作。
 
 例如
@@ -7,7 +8,7 @@
 peer chaincode invoke -n test_cc -c '{"Args":["invoke","a","b","10"]}' -o orderer0:7050
 ```
 
-命令会调用 chaincodeQuery。
+命令会调用 chaincodeInvoke。
 
 首先会调用 InitCmdFactory，初始化 Endosermentclient、Signer 等结构。这一步对于所有 chaincode 子命令来说都是类似的，个别会初始化不同的结构。
 
