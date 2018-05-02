@@ -1,8 +1,8 @@
 ### getlevel.go
 
-`peer logging getlevel`命令的入口。如peer `logging getlevel `&lt;module&gt;
+`peer logging getlevel`命令的入口。如peer `logging getlevel`&lt;module&gt;
 
-命令处理函数是fetch，首先通过 InitCmdFactory 进行初始化，然后根据不同参数查询不同block。
+命令处理函数是getLevel，首先通过 InitCmdFactory 进行初始化，然后根据不同参数查询不同block。
 
 * newest：调用deliverclient中getNewestBlock函数查询
 * oldest：调用deliverclient中getOldestBlock函数查询
