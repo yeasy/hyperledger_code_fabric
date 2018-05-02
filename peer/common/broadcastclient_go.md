@@ -1,6 +1,4 @@
 ### broadcastclient.go
 
-endorser向orderer发送交易的client接口和功能实现。
-
-
+endorser向orderer发送交易的BroadcastClient接口和功能实现。
 
