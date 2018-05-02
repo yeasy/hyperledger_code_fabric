@@ -6,5 +6,5 @@
 
 * 使用grpc client AdminClient.RevertLogLevels向peer请求恢复到上一次启动前log等级
 
-将查询到的logResponse输出到logger。
+
 
