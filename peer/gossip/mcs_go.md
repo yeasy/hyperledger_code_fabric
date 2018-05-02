@@ -40,5 +40,29 @@ mspMessageCryptoService：gossip消息加密服务相关实现，其实现了Mes
 
 #### Verify
 
+在peer的验证密钥下，检查签名是否是消息的有效签名。
+
+* 调用getValidatedIdentity获得identity和chainID
+* 如果chainID为空，说明peerIdentity属于peer的本地MSP，调用identity.Verify直接验证签名
+* 如果chainID不为空，签名必须与该通道chainid所在channel读策略验证，调用VerifyByChannel验证。
+
+#### VerifyByChannel
+
+* 通过chainID获得策略管理器
+* 策略管理器取得channel读策略
+* 使用读策略来评价消息和签名是否一致
+
+#### Expiration
+
+获得peerIdentity的过期时间
+
+#### getValidatedIdentity
+
+使用peerIdentity获得msp identity和chainID
+
+* 注意peerIdentity假定是Identity的序列化。首先把peerIdentity反序列化，此处用的是deserializer实例。
+* 然后与本地msp进行比对，获得本地反序列化实例GetLocalDeserializer，对peerIdentity反序列化。如果没有报错，则认为local MSP成功反序列化了，进一步校验其它属性和msp Identifier。满足要求则peerIdentity属于peer的本地MSP，返回identity和空的chainID。
+* 上面一步没有校验成功，则调用GetChannelDeserializers获得chainID和对应的IdentityDeserializer，然后使用反序列化实例deserializer进行peerIdentity反序列化，判断获得identity有效性，合格则返回，否则最终返回错误
+
 
 
