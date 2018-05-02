@@ -1,6 +1,6 @@
 ### setlevel.go
 
-`peer logging getlevel`命令的入口。如peer `logging getlevel`&lt;module&gt;
+`peer logging setlevel`命令的入口。如peer `logging `setlevel  &lt;module regular expression&gt; &lt;log level&gt;
 
 命令处理函数是getLevel，首先通过 InitCmdFactory 进行初始化，然后向peer查询。
 
