@@ -26,3 +26,30 @@
 
 执行提案proposal
 
+* 如果是部署chaincode，调用Execute
+* 如果是执行chaincode，先装饰chaincode input，然后执行ExecuteChaincode
+
+#### GetChaincodeDefinition
+
+返回chaincode的resourcesconfig.ChaincodeDefinition结构
+
+#### CheckACL
+
+检查签名proposal是否符合ACL策略
+
+#### IsJavaCC
+
+是否java chaincode
+
+#### CheckInstantiationPolicy
+
+检查账本的实例化策略和chaincode ChaincodeDefinition是否一致
+
+#### GetApplicationConfig
+
+获得channel的SharedConfig配置
+
+#### shorttxid
+
+缩短txid，最多缩短到8位。
+
