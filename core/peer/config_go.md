@@ -18,3 +18,16 @@ var syncStateDeltasChannelSize int
 var syncBlocksChannelSize int
 var validatorEnabled bool
 ```
+
+#### CacheConfiguration
+
+定义getLocalAddress、getPeerEndpoint 2个内部函数，然后调用它们得到配置的peer ip address以及peerEndpoint。
+
+#### GetServerConfig
+
+构造并返回peer grpc服务端的TLS配置。
+
+#### GetClientCertificate
+
+返回用户grpc客户端的TLS证书配置。
+
