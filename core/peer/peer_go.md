@@ -4,71 +4,68 @@
 
 比较核心的数据结构。
 
-Peer 接口，两个方法：包括获取一个 peer 端点和发送探测 hello 消息。
-
 ```go
-type Peer interface {
-	GetPeerEndpoint() (*pb.PeerEndpoint, error)
-	NewOpenchainDiscoveryHello() (*pb.Message, error)
-}
-```
-
-具体实现的数据结构为 PeerImpl。
-
-```go
-type PeerImpl struct {
-	handlerFactory HandlerFactory  // 生成一个 MessageHandler
-	handlerMap     *handlerMap     // 所有注册上来的消息处理器
-	ledgerWrapper  *ledgerWrapper  // ledger 操作句柄
-	secHelper      crypto.Peer     // 处理身份验证和安全相关
-	engine         Engine          // handler 工厂 + 本地交易处理的引擎
-	isValidator    bool
-	reconnectOnce  sync.Once
-	discHelper     discovery.Discovery //探测任务句柄
-	discPersist    bool
+type chainSupport struct {
+    bundleSource *resourcesconfig.BundleSource
+    channelconfig.Resources
+    channelconfig.Application
+    ledger     ledger.PeerLedger
+    fileLedger *fileledger.FileLedger
 }
 ```
 
 核心方法，包括：
 
-* ExecuteTransaction：准备执行一个交易，发送给本地的引擎（VP 节点），或给远端的 peer；
-* Broadcast：向所有注册的消息句柄发送消息；
-* Unicast：向指定的 peer 发送消息；
-* 一系列 Get 方法：包括获取 Block 内容、获取当前链的大小、当前状态的 hash、获取已注册的 peer 端点、远端 ledger 等等，很多功能实际上都是通过其它包来完成。
-* sendTransactionsToLocalEngine：交易发给本地的引擎处理；
-* SendTransactionsToPeer：交易发给其它 peer 处理；
+* Apply：尝试将一个configtx配置应用到新配置中；
+* Ledger：返回peer账本；
+* GetMSPIDs：返回channel的MSPid；
+* Sequence：返回序列号。
+* Reader：返回区块链的读取者reader；
+* Errored：返回一个通道，该通道在后台接收方出错时关闭；
 
+#### chain相关
 
-#### 消息相关
-
-两个基础接口 MessageHandler 和 MessageHandlerCoordinator。
-
-```go
-type MessageHandler interface {
-	RemoteLedger    // 获取远端的 ledger
-	HandleMessage(msg *pb.Message) error // 接收到某个消息进行处理
-	SendMessage(msg *pb.Message) error //发送消息到对端
-	To() (pb.PeerEndpoint, error) // 对端是哪个节点
-	Stop() error
-}
-```
+两个基础结构
 
 ```go
-type MessageHandlerCoordinator interface {
-	Peer
-	SecurityAccessor
-	BlockChainAccessor
-	BlockChainModifier
-	BlockChainUtil
-	StateAccessor
-	RegisterHandler(messageHandler MessageHandler) error
-	DeregisterHandler(messageHandler MessageHandler) error
-	Broadcast(*pb.Message, pb.PeerEndpoint_Type) []error
-	Unicast(*pb.Message, *pb.PeerID) error
-	GetPeers() (*pb.PeersMessage, error)
-	GetRemoteLedger(receiver *pb.PeerID) (RemoteLedger, error)
-	PeersDiscovered(*pb.PeersMessage) error
-	ExecuteTransaction(transaction *pb.Transaction) *pb.Response
-	Discoverer
+// chain is a local struct to manage objects in a chain
+type chain struct {
+    cs        *chainSupport
+    cb        *common.Block
+    committer committer.Committer
 }
+
+// chains is a local map of chainID->chainObject
+var chains = struct {
+    sync.RWMutex
+    list map[string]*chain
+}{list: make(map[string]*chain)}
 ```
+
+#### Initialize
+
+peer初始化核心方法之一，在账本和gossip服务ready后调用，是在peer node start命令中调用的此函数。功能是从永久存储中恢复并建立所有的区块链。
+
+* 首先创建一个新的加权信号量，其有并发访问的最大组合权重；
+* 区块链初始化函数赋值；
+* 区块链账本管理器初始化，并取出所有账本id；针对每个账本进行如下操作：打开账本，读取账本配置块，使用配置块创建账本的区块链，初始化区块链。
+
+#### getCurrConfigBlockFromLedger
+
+从账本中读取区块链配置块。
+
+* 先用账本取得区块链的基本信息；
+* 再使用GetBlockByNumber获得最后一个区块；
+* 从最后一个区块的metadata中获得最后一个配置区块的index
+* 最后使用GetBlockByNumber获得最后一个配置区块返回
+
+#### createChain
+
+使用账本配置和区块配置创建一个区块链chain，并插入到本地的chains链表中。
+
+依次初始化chainSupport和commiter，然后加入配置块构成chain结构。这其中包含了p2p协议gossip的初始化和事件处理函数配置。
+
+
+
+
+
