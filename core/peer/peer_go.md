@@ -8,8 +8,8 @@ Peer 接口，两个方法：包括获取一个 peer 端点和发送探测 hello
 
 ```go
 type Peer interface {
-	GetPeerEndpoint() (*pb.PeerEndpoint, error)
-	NewOpenchainDiscoveryHello() (*pb.Message, error)
+    GetPeerEndpoint() (*pb.PeerEndpoint, error)
+    NewOpenchainDiscoveryHello() (*pb.Message, error)
 }
 ```
 
@@ -17,15 +17,15 @@ type Peer interface {
 
 ```go
 type PeerImpl struct {
-	handlerFactory HandlerFactory  // 生成一个 MessageHandler
-	handlerMap     *handlerMap     // 所有注册上来的消息处理器
-	ledgerWrapper  *ledgerWrapper  // ledger 操作句柄
-	secHelper      crypto.Peer     // 处理身份验证和安全相关
-	engine         Engine          // handler 工厂 + 本地交易处理的引擎
-	isValidator    bool
-	reconnectOnce  sync.Once
-	discHelper     discovery.Discovery //探测任务句柄
-	discPersist    bool
+    handlerFactory HandlerFactory  // 生成一个 MessageHandler
+    handlerMap     *handlerMap     // 所有注册上来的消息处理器
+    ledgerWrapper  *ledgerWrapper  // ledger 操作句柄
+    secHelper      crypto.Peer     // 处理身份验证和安全相关
+    engine         Engine          // handler 工厂 + 本地交易处理的引擎
+    isValidator    bool
+    reconnectOnce  sync.Once
+    discHelper     discovery.Discovery //探测任务句柄
+    discPersist    bool
 }
 ```
 
@@ -38,37 +38,39 @@ type PeerImpl struct {
 * sendTransactionsToLocalEngine：交易发给本地的引擎处理；
 * SendTransactionsToPeer：交易发给其它 peer 处理；
 
-
 #### 消息相关
 
 两个基础接口 MessageHandler 和 MessageHandlerCoordinator。
 
 ```go
 type MessageHandler interface {
-	RemoteLedger    // 获取远端的 ledger
-	HandleMessage(msg *pb.Message) error // 接收到某个消息进行处理
-	SendMessage(msg *pb.Message) error //发送消息到对端
-	To() (pb.PeerEndpoint, error) // 对端是哪个节点
-	Stop() error
+    RemoteLedger    // 获取远端的 ledger
+    HandleMessage(msg *pb.Message) error // 接收到某个消息进行处理
+    SendMessage(msg *pb.Message) error //发送消息到对端
+    To() (pb.PeerEndpoint, error) // 对端是哪个节点
+    Stop() error
 }
 ```
 
 ```go
 type MessageHandlerCoordinator interface {
-	Peer
-	SecurityAccessor
-	BlockChainAccessor
-	BlockChainModifier
-	BlockChainUtil
-	StateAccessor
-	RegisterHandler(messageHandler MessageHandler) error
-	DeregisterHandler(messageHandler MessageHandler) error
-	Broadcast(*pb.Message, pb.PeerEndpoint_Type) []error
-	Unicast(*pb.Message, *pb.PeerID) error
-	GetPeers() (*pb.PeersMessage, error)
-	GetRemoteLedger(receiver *pb.PeerID) (RemoteLedger, error)
-	PeersDiscovered(*pb.PeersMessage) error
-	ExecuteTransaction(transaction *pb.Transaction) *pb.Response
-	Discoverer
+    Peer
+    SecurityAccessor
+    BlockChainAccessor
+    BlockChainModifier
+    BlockChainUtil
+    StateAccessor
+    RegisterHandler(messageHandler MessageHandler) error
+    DeregisterHandler(messageHandler MessageHandler) error
+    Broadcast(*pb.Message, pb.PeerEndpoint_Type) []error
+    Unicast(*pb.Message, *pb.PeerID) error
+    GetPeers() (*pb.PeersMessage, error)
+    GetRemoteLedger(receiver *pb.PeerID) (RemoteLedger, error)
+    PeersDiscovered(*pb.PeersMessage) error
+    ExecuteTransaction(transaction *pb.Transaction) *pb.Response
+    Discoverer
 }
 ```
+
+
+
