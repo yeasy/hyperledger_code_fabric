@@ -4,7 +4,7 @@
 
 这些交易提案可能包括链码的安装、实例化、升级、调用、查询；以及 Peer 节点加入和列出通道操作。
 
-Peer 接收到请求后，会调用 `core/endorser/endorser.go` 中 `Endorser` 结构体 的`ProcessProposal(ctx context.Context, signedProp *pb.SignedProposal) (*pb.ProposalResponse, error)` 方法，进行具体的背书处理。
+Peer 接收到请求后，会调用 `core/endorser/Endorser` 结构体的 `ProcessProposal(ctx context.Context, signedProp *pb.SignedProposal) (*pb.ProposalResponse, error)` 方法，进行具体的背书处理。
 
 背书过程主要完成如下操作：
 
@@ -18,7 +18,7 @@ Peer 接收到请求后，会调用 `core/endorser/endorser.go` 中 `Endorser` �
 
 ![Endorser ProcessProposal 过程](_images/endorser_ProcessProposal.png)
 
-* 检查提案合法性；
+* 检查提案合法性，主要由 `preProcess(signedProp *pb.SignedProposal) (*validateResult, error)` 方法完成；
     * 调用 ValidateProposalMessage() 方法对签名的提案进行格式检查，主要包括：
         * Channel 头部格式：是否合法头部类型，由 validateChannelHeader() 完成；
         * 签名头格式：是否包括了 nonce 和creators 数据，由 validateSignatureHeader() 完成；

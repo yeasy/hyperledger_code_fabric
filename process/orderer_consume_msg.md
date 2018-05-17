@@ -131,11 +131,15 @@ func (chain *chainImpl) processRegular(regularMessage *ab.KafkaMessageRegular, r
 
 #### 普通交易消息
 
-普通交易消息，会检查是否满足生成区块的条件，满足则产生区块并写入本地账本结构。通过内部的 `commitNormalMsg(env)` 方法来完成。
+普通交易消息，会检查是否合法（offset、配置版本号是否匹配），通过检查则扔给内部的 `commitNormalMsg(env)` 方法来处理。
 
-该方法主要调用 `orderer/common/multichannel` 模块中 `BlockWriter` 结构体的 `CreateNextBlock(messages []*cb.Envelope) *cb.Block` 方法和 `WriteBlock(block *cb.Block, encodedMetadataValue []byte)` 方法。
+`commitNormalMsg(env)` 将消息扔给本地缓冲，并检查是否需要进行切块：batches, pending := chain.BlockCutter().Ordered(message)。
 
-`CreateNextBlock(messages []*cb.Envelope) *cb.Block` 方法基本过程十分简单，创建新的区块，将传入的交易的信封结构直接序列化到 `block.Data.Data[]` 域中。
+如果不需要切块，则更新 lastOriginalOffsetProcessed 后返回；否则尝试重置 BatchTimeout 计时器，进行切块处理。
+
+切块处理主要调用 `orderer/common/multichannel.BlockWriter` 结构体的 `CreateNextBlock(messages []*cb.Envelope) *cb.Block`、`WriteBlock(block *cb.Block, encodedMetadataValue []byte)` 两个方法。
+
+`CreateNextBlock(messages []*cb.Envelope) *cb.Block` 方法基本过程十分简单，创建新的区块，将传入的交易信封结构直接序列化到 `block.Data.Data[]` 数组中，并创建区块头信息（包括配置序列号、前导区块头 Hash、本区块数据内容的 Hash）。
 
 ```go
 // orderer/common/multichannel/blockwriter.go
@@ -161,7 +165,8 @@ func (bw *BlockWriter) CreateNextBlock(messages []*cb.Envelope) *cb.Block {
 	return block
 }
 ```
-`WriteBlock(block *cb.Block, encodedMetadataValue []byte)` 方法则将 Kafka 相关的元数据也附加到区块结构中，添加区块的签名、最新配置的签名，并写入到本地账本。
+
+`WriteBlock(block *cb.Block, encodedMetadataValue []byte)` 方法则进一步调用 `commitBlock(encodedMetadataValue []byte)` 方法，填写 ORDERER、SIGNATURES、LAST_CONFIG 三个元数据域的内容。最终，调用 `common/ledger/blkstorage/fsblkstorage/blockfileMgr.addBlock(block *common.Block) error` 方法将区块写入到本地的账本文件中，并更新索引数据库中内容（包括区块号、区块 Hash、区块所在文件指针、交易的偏移量和区块元数据。
 
 ```go
 // orderer/common/multichannel/blockwriter.go
@@ -174,9 +179,25 @@ func (bw *BlockWriter) WriteBlock(block *cb.Block, encodedMetadataValue []byte) 
 		bw.commitBlock(encodedMetadataValue)
 	}()
 }
+
+// orderer/common/multichannel/blockwriter.go
+func (bw *BlockWriter) commitBlock(encodedMetadataValue []byte) {
+	// Set the orderer-related metadata field
+	if encodedMetadataValue != nil {
+		bw.lastBlock.Metadata.Metadata[cb.BlockMetadataIndex_ORDERER] = utils.MarshalOrPanic(&cb.Metadata{Value: encodedMetadataValue})
+	}
+	bw.addBlockSignature(bw.lastBlock)
+	bw.addLastConfigSignature(bw.lastBlock)
+
+	err := bw.support.Append(bw.lastBlock)
+	if err != nil {
+		logger.Panicf("[channel: %s] Could not append block: %s", bw.support.ChainID(), err)
+	}
+	logger.Debugf("[channel: %s] Wrote block %d", bw.support.ChainID(), bw.lastBlock.GetHeader().Number)
+}
 ```
 
-Kafka 相关的元数据（KafkaMetadata）包括：
+ORDERER 相关的元数据包括：
 
 * LastOffsetPersisted：上次消息的偏移量；
 * LastOriginalOffsetProcessed：本条消息被重复处理时，最新的偏移量；
@@ -281,7 +302,7 @@ func (bw *BlockWriter) WriteConfigBlock(block *cb.Block, encodedMetadataValue []
 ```
 
 ##### 创建新的应用通道
-创建新的本地账本结构并启动对应的轮询消息过程，实际调用 `orderer/common/multichannel.Registrar.newChain(configtx *cb.Envelope)` 方法。
+创建新的本地账本结构并启动对应的轮询消息过程，实际调用 `orderer/common/multichannel/Registrar.newChain(configtx *cb.Envelope)` 方法。
 
 该方法首先根据当前给定的配置来创建账本结构，之后初始化该账本对应的 ChainSupport 数据结构，最后调用 cs.start() 启动对应通道的消息处理服务。
 
