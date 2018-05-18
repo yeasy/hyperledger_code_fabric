@@ -102,13 +102,14 @@ logger.Fatal("Failed to return new GRPC server:", err)
 
 ```go
 type Registrar struct {
-    chains          map[string]*ChainSupport
-    consenters      map[string]consensus.Consenter
-    ledgerFactory   ledger.Factory
-    signer          crypto.LocalSigner
-    systemChannelID string
-    systemChannel   *ChainSupport
-    templator       msgprocessor.ChannelConfigTemplator
+	chains          map[string]*ChainSupport
+	consenters      map[string]consensus.Consenter
+	ledgerFactory   blockledger.Factory
+	signer          crypto.LocalSigner
+	systemChannelID string
+	systemChannel   *ChainSupport
+	templator       msgprocessor.ChannelConfigTemplator
+	callbacks       []func(bundle *channelconfig.Bundle)
 }
 ```
 
@@ -131,23 +132,24 @@ multichannel.NewRegistrar\(\) 方法会查看本地已有的链结构文件（�
 
 ```go
 type server struct {
-    bh broadcast.Handler
-    dh deliver.Handler
+	bh    broadcast.Handler
+	dh    deliver.Handler
+	debug *localconfig.Debug
+	*multichannel.Registrar
 }
 ```
 
 NewServer 分别初始化这两个句柄，挂载上前面初始化的 multichannel.Registrar 结构。broadcast 句柄还需要初始化一个配置更新的处理器，负责处理 CONFIG\_UPDATE 交易。
 
 ```go
-func NewServer(ml multichain.Manager, signer crypto.LocalSigner) ab.AtomicBroadcastServer {
-    s := &server{
-        dh: deliver.NewHandlerImpl(deliverSupport{Manager: ml}),
-        bh: broadcast.NewHandlerImpl(broadcastSupport{
-            Manager:               ml,
-            ConfigUpdateProcessor: configupdate.New(ml.SystemChannelID(), configUpdateSupport{Manager: ml}, signer),
-        }),
-    }
-    return s
+func NewServer(r *multichannel.Registrar, _ crypto.LocalSigner, debug *localconfig.Debug, timeWindow time.Duration, mutualTLS bool) ab.AtomicBroadcastServer {
+	s := &server{
+		dh:        deliver.NewHandlerImpl(deliverSupport{Registrar: r}, timeWindow, mutualTLS),
+		bh:        broadcast.NewHandlerImpl(broadcastSupport{Registrar: r}),
+		debug:     debug,
+		Registrar: r,
+	}
+	return s
 }
 ```
 
