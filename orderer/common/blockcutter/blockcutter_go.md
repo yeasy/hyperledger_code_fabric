@@ -4,9 +4,9 @@
 
 ```go
 type Receiver interface {
-	Ordered(msg *cb.Envelope) (messageBatches [][]*cb.Envelope, pending bool)
+    Ordered(msg *cb.Envelope) (messageBatches [][]*cb.Envelope, pending bool)
 
-	Cut() []*cb.Envelope
+    Cut() []*cb.Envelope
 }
 ```
 
@@ -20,5 +20,5 @@ type Receiver interface {
 
 #### Cut
 
-切割函数。
+切割函数，将区块消息进行切割。
 
