@@ -1,0 +1,1 @@
+## generateHelpDocs.sh

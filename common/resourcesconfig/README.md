@@ -1,1 +1,0 @@
-## resourcesconfig 包
