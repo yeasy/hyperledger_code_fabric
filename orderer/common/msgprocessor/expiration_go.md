@@ -1,10 +1,10 @@
 #### expiration.go
 
-判断消息是否过期。
+判断消息是否过期的过滤器。
 
 ```
 type expirationRejectRule struct {
-	filterSupport resources
+    filterSupport resources
 }
 ```
 
