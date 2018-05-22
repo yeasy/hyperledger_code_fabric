@@ -4,12 +4,12 @@
 
 ```
 type BlockWriter struct {
-	support            blockWriterSupport
-	registrar          *Registrar
-	lastConfigBlockNum uint64
-	lastConfigSeq      uint64
-	lastBlock          *cb.Block
-	committingBlock    sync.Mutex
+    support            blockWriterSupport
+    registrar          *Registrar
+    lastConfigBlockNum uint64
+    lastConfigSeq      uint64
+    lastBlock          *cb.Block
+    committingBlock    sync.Mutex
 }
 ```
 
@@ -23,7 +23,7 @@ BlockWriter会使用一个锁和在写入文件时创建出一个committer协程
 
 解析区块中的envelope配置信息，得到channel header类型
 
-* HeaderType\_ORDERER\_TRANSACTION类型，新建channel控制信息，
+* HeaderType\_ORDERER\_TRANSACTION类型，新建channel控制信息和管理handler，
 
 * HeaderType\_CONFIG类型，更新channel的配置信息
 
