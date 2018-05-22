@@ -17,4 +17,4 @@ type BCCSPFactory interface {
 实现了两个工厂结构：
 
 * SWFactory：软件 bccsp 的工厂；
-* PKCS11Factory：基于高安全模块的实现。
+* PKCS11Factory：基于硬件安全模块的实现。

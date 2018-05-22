@@ -1,6 +1,6 @@
 ## cauthdsl
 
-实现 Policy 相关的数据结构和方法。
+实现 Policy 相关的数据结构和方法，包括验证、构造等。
 
 fabric 中，策略主要分为签名策略（SignaturePolicy）和隐式策略（ImplicitMetaPolicy）两种。
 
