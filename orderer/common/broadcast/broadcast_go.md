@@ -6,7 +6,7 @@ handlerImpl 结构体十分重要，完成对 Broadcast 请求的核心处理过
 
 ```go
 type handlerImpl struct {
-	sm ChannelSupportRegistrar
+    sm ChannelSupportRegistrar
 }
 
 func (bh *handlerImpl) Handle(srv ab.AtomicBroadcast_BroadcastServer) error
@@ -26,29 +26,28 @@ chdr, isConfig, processor, err := bh.sm.BroadcastChannelSupport(msg)
 
 ```go
 func (r *Registrar) BroadcastChannelSupport(msg *cb.Envelope) (*cb.ChannelHeader, bool, *ChainSupport, error) {
-	chdr, err := utils.ChannelHeader(msg)
-	if err != nil {
-		return nil, false, nil, fmt.Errorf("could not determine channel ID: %s", err)
-	}
+    chdr, err := utils.ChannelHeader(msg)
+    if err != nil {
+        return nil, false, nil, fmt.Errorf("could not determine channel ID: %s", err)
+    }
 
-	cs, ok := r.chains[chdr.ChannelId] //应用通道、系统通道
-	if !ok {
-		cs = r.systemChannel
-	}
+    cs, ok := r.chains[chdr.ChannelId] //应用通道、系统通道
+    if !ok {
+        cs = r.systemChannel
+    }
 
-	isConfig := false
-	switch cs.ClassifyMsg(chdr) {
-	case msgprocessor.ConfigUpdateMsg:
-		isConfig = true
-	default:
-	}
+    isConfig := false
+    switch cs.ClassifyMsg(chdr) {
+    case msgprocessor.ConfigUpdateMsg:
+        isConfig = true
+    default:
+    }
 
-	return chdr, isConfig, cs, nil
+    return chdr, isConfig, cs, nil
 }
 ```
 
-channel 头部从消息信封结构中解析出来；是否为配置信息根据消息头中类型进行判断（是否为 cb.HeaderType_CONFIG_UPDATE）;通过字典查到对应的 ChainSupport 结构（应用通道、系统通道）作为处理器。
-
+channel 头部从消息信封结构中解析出来；是否为配置信息根据消息头中类型进行判断（是否为 cb.HeaderType\_CONFIG\_UPDATE）;通过字典查到对应的 ChainSupport 结构（应用通道、系统通道）作为处理器。
 
 之后，利用解析后的结果，分别对不同类型的消息（普通消息、配置消息）进行不同处理。下面以应用通道的 ChainSupport 结构作为处理器进行介绍。
 
@@ -61,13 +60,13 @@ configSeq, err := processor.ProcessNormalMsg(msg) //消息检查
 processor.Order(msg, configSeq) //入队列操作
 ```
 
-消息检查方法会映射到 orderer.common.msgprocessor 包中 StandardChannel 结构体的 `ProcessNormalMsg(env *cb.Envelope) (configSeq uint64, err error)` 方法，实现如下。 
+消息检查方法会映射到 orderer.common.msgprocessor 包中 StandardChannel 结构体的 `ProcessNormalMsg(env *cb.Envelope) (configSeq uint64, err error)` 方法，实现如下。
 
 ```go
 func (s *StandardChannel) ProcessNormalMsg(env *cb.Envelope) (configSeq uint64, err error) {
-	configSeq = s.support.Sequence() // 获取配置的序列号，映射到 common.configtx 包中 configManager 结构体的对应方法
-	err = s.filters.Apply(env) // 进行过滤检查，实现为 orderer.common.msgprocessor 包中 RuleSet 结构体的对应方法。
-	return
+    configSeq = s.support.Sequence() // 获取配置的序列号，映射到 common.configtx 包中 configManager 结构体的对应方法
+    err = s.filters.Apply(env) // 进行过滤检查，实现为 orderer.common.msgprocessor 包中 RuleSet 结构体的对应方法。
+    return
 }
 ```
 
@@ -82,14 +81,14 @@ func (s *StandardChannel) ProcessNormalMsg(env *cb.Envelope) (configSeq uint64, 
 
 ```go
 func (chain *chainImpl) Order(env *cb.Envelope, configSeq uint64) error {
-	marshaledEnv, err := utils.Marshal(env)
-	if err != nil {
-		return fmt.Errorf("cannot enqueue, unable to marshal envelope because = %s", err)
-	}
-	if !chain.enqueue(newNormalMessage(marshaledEnv, configSeq)) {
-		return fmt.Errorf("cannot enqueue")
-	}
-	return nil
+    marshaledEnv, err := utils.Marshal(env)
+    if err != nil {
+        return fmt.Errorf("cannot enqueue, unable to marshal envelope because = %s", err)
+    }
+    if !chain.enqueue(newNormalMessage(marshaledEnv, configSeq)) {
+        return fmt.Errorf("cannot enqueue")
+    }
+    return nil
 }
 ```
 
@@ -102,34 +101,34 @@ config, configSeq, err := processor.ProcessConfigUpdateMsg(msg) // 合并配置�
 processor.Configure(config, configSeq) //入队列操作
 ```
 
-合并配置更新消息方法会映射到 orderer.common.msgprocessor 包中 StandardChannel 结构体的 `ProcessConfigUpdateMsg(env *cb.Envelope) (configSeq uint64, err error)` 方法，计算合并后的配置和配置编号，实现如下。 
+合并配置更新消息方法会映射到 orderer.common.msgprocessor 包中 StandardChannel 结构体的 `ProcessConfigUpdateMsg(env *cb.Envelope) (configSeq uint64, err error)` 方法，计算合并后的配置和配置编号，实现如下。
 
 ```go
 func (s *StandardChannel) ProcessConfigUpdateMsg(env *cb.Envelope) (config *cb.Envelope, configSeq uint64, err error) {
-	logger.Debugf("Processing config update message for channel %s", s.support.ChainID())
+    logger.Debugf("Processing config update message for channel %s", s.support.ChainID())
 
-	seq := s.support.Sequence()
-	err = s.filters.Apply(env)
-	if err != nil {
-		return nil, 0, err
-	}
+    seq := s.support.Sequence()
+    err = s.filters.Apply(env)
+    if err != nil {
+        return nil, 0, err
+    }
 
-	configEnvelope, err := s.support.ProposeConfigUpdate(env)
-	if err != nil {
-		return nil, 0, err
-	}
+    configEnvelope, err := s.support.ProposeConfigUpdate(env)
+    if err != nil {
+        return nil, 0, err
+    }
 
-	config, err = utils.CreateSignedEnvelope(cb.HeaderType_CONFIG, s.support.ChainID(), s.support.Signer(), configEnvelope, msgVersion, epoch)
-	if err != nil {
-		return nil, 0, err
-	}
+    config, err = utils.CreateSignedEnvelope(cb.HeaderType_CONFIG, s.support.ChainID(), s.support.Signer(), configEnvelope, msgVersion, epoch)
+    if err != nil {
+        return nil, 0, err
+    }
 
-	err = s.filters.Apply(config)
-	if err != nil {
-		return nil, 0, err
-	}
+    err = s.filters.Apply(config)
+    if err != nil {
+        return nil, 0, err
+    }
 
-	return config, seq, nil
+    return config, seq, nil
 }
 ```
 
@@ -139,14 +138,14 @@ func (s *StandardChannel) ProcessConfigUpdateMsg(env *cb.Envelope) (config *cb.E
 
 ```go
 func (chain *chainImpl) Configure(config *cb.Envelope, configSeq uint64) error {
-	marshaledConfig, err := utils.Marshal(config)
-	if err != nil {
-		return fmt.Errorf("cannot enqueue, unable to marshal config because = %s", err)
-	}
-	if !chain.enqueue(newConfigMessage(marshaledConfig, configSeq)) {
-		return fmt.Errorf("cannot enqueue")
-	}
-	return nil
+    marshaledConfig, err := utils.Marshal(config)
+    if err != nil {
+        return fmt.Errorf("cannot enqueue, unable to marshal config because = %s", err)
+    }
+    if !chain.enqueue(newConfigMessage(marshaledConfig, configSeq)) {
+        return fmt.Errorf("cannot enqueue")
+    }
+    return nil
 }
 ```
 
@@ -157,3 +156,6 @@ func (chain *chainImpl) Configure(config *cb.Envelope, configSeq uint64) error {
 ```go
 err = srv.Send(&ab.BroadcastResponse{Status: cb.Status_SUCCESS})
 ```
+
+
+
