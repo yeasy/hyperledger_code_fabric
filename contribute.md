@@ -1,5 +1,6 @@
 ## 参与贡献
 
+
 贡献者 [名单](https://github.com/yeasy/hyperledger_code_fabric/graphs/contributors)。
 
 本书源码开源托管在 Github 上，欢迎参与维护：[github.com/yeasy/hyperledger\_code\_fabric](https://github.com/yeasy/hyperledger_code_fabric)。
