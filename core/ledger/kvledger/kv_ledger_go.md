@@ -4,9 +4,12 @@
 
 ```go
 type kvLedger struct {
-	ledgerID   string
-	blockStore blkstorage.BlockStore
-	txtmgmt    txmgr.TxMgr
-	historyDB  historydb.HistoryDB
+	ledgerID               string
+	blockStore             *ledgerstorage.Store
+	txtmgmt                txmgr.TxMgr
+	historyDB              historydb.HistoryDB
+	configHistoryRetriever ledger.ConfigHistoryRetriever
+	blockAPIsRWLock        *sync.RWMutex
 }
 ```
+
