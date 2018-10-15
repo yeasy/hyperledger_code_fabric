@@ -6,7 +6,7 @@
 * [整体结构](overview.md)
 * [核心过程](process/README.md)
   * [链码容器启动](process/chaincode_start.md)
-  * [Peer 节点 启动过程](process/peer_start.md)
+  * [Peer 节点启动过程](process/peer_start.md)
   * [Peer 节点提案背书过程](process/peer_endorse.md)
   * [Peer 节点链码调用过程](process/peer_callChaincode.md)
   * [Peer 节点提交交易过程](process/peer_commit.md)
