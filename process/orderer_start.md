@@ -168,7 +168,7 @@ chain.processMessagesToBlocks()
 
 * 创建到 Kafka 集群的 Producer 结构并发送 CONNECT 消息；
 * 为对应的 topic 创建 Consumer 结构，并配置从指定分区读取消息的 PartitionConsumer 结构；
-* 对链对应的 Kafka 分区中消息的进行循环处理。这部分更详细内容可以参考 [Orderer 节点对排序后消息的处理过程](https://github.com/yeasy/hyperledger_code_fabric/blob/master/process/orderer_msg.md)。
+* 对链对应的 Kafka 分区中消息的进行循环处理。这部分更详细内容可以参考 [Orderer 节点对排序后消息的处理过程](https://github.com/yeasy/hyperledger_code_fabric/blob/master/process/orderer_consume_msg.md)。
 
 ### gRPC 服务启动
 
