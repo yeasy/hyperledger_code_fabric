@@ -1,1 +1,0 @@
-#### vscc_validator.go

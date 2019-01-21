@@ -1,0 +1,1 @@
+### configtx_template.go

@@ -1,0 +1,1 @@
+### setlogspec.go

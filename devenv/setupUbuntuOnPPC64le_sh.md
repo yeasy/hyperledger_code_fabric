@@ -1,1 +1,0 @@
-## setupUbuntuOnPPC64le.sh

@@ -1,1 +1,0 @@
-### configtxgen.go

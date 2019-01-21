@@ -1,1 +1,0 @@
-### configtx.yaml

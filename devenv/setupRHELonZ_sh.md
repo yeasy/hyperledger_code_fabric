@@ -1,1 +1,0 @@
-## setupRHELonZ.sh

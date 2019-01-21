@@ -1,1 +1,0 @@
-### idemixgen.go

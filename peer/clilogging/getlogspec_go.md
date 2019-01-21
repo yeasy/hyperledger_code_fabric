@@ -1,0 +1,1 @@
+### getlogspec.go
