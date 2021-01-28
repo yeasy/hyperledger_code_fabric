@@ -9,26 +9,26 @@ Hyperledger Fabric 从 1.0.0 开始，架构已经解耦为三个主要部分：
 其中，fabric-peer 和 fabric-order 代码暂时都在 fabric 项目中，未来可能进一步拆分。
 
 ## 核心代码
-fabric 项目中主要包括代码、工具、脚本等部分，核心源代码目前（v1.4.0）为 786 个文件，147K 行。
+fabric 项目中主要包括代码、工具、脚本等部分，核心源代码目前（v2.3.0）为 793 个文件，147K 行。
 
 ```sh
 $ cd fabric
-$ find bccsp cmd common core discovery gossip idemix internal msp orderer peer protos token \
+$ find find bccsp cmd common core discovery gossip idemix internal msp orderer peer pkg protoutil \
     -not -path "*/vendor/*" \
     -not -path "*mock*" \
     -name "*.go"  \
     -not -name "*_test.go" \
     -not -name "test_*.go" \
     | wc -l
-786
-$ find bccsp cmd common core discovery gossip idemix internal msp orderer peer protos token \
+793
+$ find bccsp cmd common core discovery gossip idemix internal msp orderer peer pkg protoutil \
     -not -path "*/vendor/*" \
     -not -path "*mock*" \
     -name "*.go"  \
     -not -name "*_test.go" \
     -not -name "test_*.go" \
     | xargs cat | wc -l
-147413
+154145
 ```
 
 ### 源代码
